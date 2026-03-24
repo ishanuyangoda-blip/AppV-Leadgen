@@ -20,8 +20,8 @@
 html { scroll-behavior: smooth; }
 body { font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--text); line-height: 1.65; min-height: 100vh; -webkit-font-smoothing: antialiased; font-size: 16px; }
 
-nav { position: sticky; top: 0; z-index: 100; background: rgba(13,21,32,0.92); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); padding: 0 6%; display: flex; align-items: center; justify-content: space-between; height: 58px; }
-.nav-logo { font-family: 'Roboto', sans-serif; font-weight: 700; font-size: 18px; color: var(--white); text-decoration: none; }
+nav { position: sticky; top: 0; z-index: 100; background: rgba(10,17,27,0.96); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0 6%; display: flex; align-items: center; justify-content: space-between; height: 58px; }
+.nav-logo { text-decoration: none; display: flex; align-items: center; } .nav-logo-img { height: 28px; width: auto; display: block; }
 .nav-back { font-size: 13px; font-weight: 500; color: var(--text-muted); text-decoration: none; transition: color 0.15s; }
 .nav-back:hover { color: var(--white); }
 
@@ -116,7 +116,7 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(13,21,32,0.92); b
 </head>
 <body>
 <nav>
-  <a href="index.html" class="nav-logo">AppVentory</a>
+  <a href="index.html" class="nav-logo"><img src="logo.png" alt="AppVentory" class="nav-logo-img"></a>
   <a href="index.html" class="nav-back">← Back to site</a>
 </nav>
 
