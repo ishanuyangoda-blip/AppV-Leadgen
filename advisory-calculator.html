@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SaaS Advisory Revenue Calculator — AppVentory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:          #0d1520;
+  --surface:     #1C2C44;
+  --surface-2:   #243350;
+  --pink:        #FF81E3;
+  --pink-dim:    rgba(255,129,227,0.10);
+  --pink-border: rgba(255,129,227,0.22);
+  --white:       #ffffff;
+  --text:        #e8ecf2;
+  --muted:       #7a8fa8;
+  --border:      rgba(255,255,255,0.07);
+  --green:       #3ecf8e;
+  --radius:      12px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 40px 20px 64px;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  padding: 48px 0 40px;
+}
+
+.logo {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--white);
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 32px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pink);
+  border: 1px solid var(--pink-border);
+  padding: 5px 14px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
+
+.header h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 900;
+  font-size: clamp(28px, 5vw, 44px);
+  letter-spacing: -1px;
+  line-height: 1.1;
+  color: var(--white);
+  margin-bottom: 14px;
+}
+
+.header h1 em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--pink);
+}
+
+.header p {
+  font-size: 16px;
+  color: var(--muted);
+  max-width: 460px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* Calculator card */
+.calc-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.calc-body { padding: 32px 28px; }
+
+/* Input group */
+.input-group {
+  margin-bottom: 32px;
+}
+.input-group:last-child { margin-bottom: 0; }
+
+.input-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.input-hint {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+
+/* Slider */
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.slider-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--pink);
+  height: 6px;
+  cursor: pointer;
+}
+
+.slider-val {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--pink);
+  min-width: 52px;
+  text-align: right;
+  line-height: 1;
+}
+
+/* Toggle chips */
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.chip {
+  padding: 9px 18px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.chip:hover { border-color: var(--pink-border); color: var(--text); }
+.chip.active { border-color: var(--pink); background: var(--pink-dim); color: var(--white); }
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 28px 0;
+}
+
+/* Results panel */
+.results-panel {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 28px;
+  display: none;
+}
+.results-panel.visible { display: block; }
+
+.results-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pink);
+  margin-bottom: 20px;
+}
+
+.result-rows { display: flex; flex-direction: column; gap: 14px; }
+
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.result-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+.result-row-label { font-size: 14px; color: var(--muted); }
+
+.result-row-val {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: -0.5px;
+}
+
+.result-row-val.highlight { color: var(--pink); }
+.result-row-val.green { color: var(--green); }
+
+/* Main result */
+.main-result {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.main-result-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.main-result-amount {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(44px, 8vw, 64px);
+  font-weight: 900;
+  color: var(--green);
+  letter-spacing: -3px;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.main-result-sub {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* Breakdown card */
+.breakdown {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 28px;
+  margin-bottom: 16px;
+}
+
+.breakdown-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.breakdown-row:last-child { border-bottom: none; }
+
+.breakdown-row span:first-child { color: var(--muted); }
+.breakdown-row span:last-child { color: var(--white); font-weight: 600; }
+
+/* Context note */
+.context-note {
+  background: var(--pink-dim);
+  border: 1px solid var(--pink-border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+
+.context-note p {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+}
+
+.context-note p + p { margin-top: 8px; }
+
+/* CTA */
+.cta-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+  text-align: center;
+}
+
+.cta-block h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 10px;
+  letter-spacing: -0.3px;
+}
+
+.cta-block p {
+  font-size: 15px;
+  color: var(--muted);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.email-row {
+  display: flex;
+  gap: 8px;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.email-row input {
+  flex: 1;
+  padding: 13px 16px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.email-row input:focus { border-color: var(--pink-border); }
+.email-row input::placeholder { color: var(--muted); }
+
+.btn {
+  padding: 13px 24px;
+  background: var(--pink);
+  color: var(--bg);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.btn:hover { opacity: 0.88; }
+
+.cta-note {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 12px;
+}
+
+.success-msg {
+  color: var(--green);
+  font-size: 15px;
+  font-weight: 600;
+  display: none;
+  padding: 12px 0;
+}
+
+.secondary-cta {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.secondary-cta a {
+  font-size: 14px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.secondary-cta a:hover { color: var(--white); }
+
+.restart-link {
+  display: inline-block;
+  margin-top: 24px;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.restart-link:hover { color: var(--text); }
+
+/* Responsive */
+@media (max-width: 480px) {
+  .container { padding: 24px 16px 48px; }
+  .calc-body { padding: 24px 20px; }
+  .email-row { flex-direction: column; }
+  .email-row .btn { width: 100%; }
+  .cta-block { padding: 28px 20px; }
+  .breakdown { padding: 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <a href="index.html" class="logo">AppVentory</a>
+    <div class="eyebrow">For advisors</div>
+    <h1>What is SaaS advisory <em>actually worth</em> to your practice?</h1>
+    <p>Adjust the inputs below to see a realistic revenue estimate for adding SaaS management as a service line — based on your client base, not industry averages.</p>
+  </div>
+
+  <!-- Calculator -->
+  <div class="calc-card">
+    <div class="calc-body">
+
+      <!-- Input 1: Client count -->
+      <div class="input-group">
+        <div class="input-label">
+          How many active clients do you advise?
+        </div>
+        <div class="input-hint">Include all clients where you have a regular engagement — accounting, tech, or advisory.</div>
+        <div class="slider-row">
+          <input type="range" id="clientCount" min="3" max="80" value="20" step="1" oninput="update()">
+          <div class="slider-val" id="clientCountVal">20</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Input 2: Client size -->
+      <div class="input-group">
+        <div class="input-label">Typical client size</div>
+        <div class="input-hint">This affects how many software subscriptions each client is likely running.</div>
+        <div class="chip-group" id="clientSizeGroup">
+          <button class="chip" data-val="micro" onclick="selectChip('clientSize', this)">1–10 employees</button>
+          <button class="chip active" data-val="small" onclick="selectChip('clientSize', this)">10–50 employees</button>
+          <button class="chip" data-val="medium" onclick="selectChip('clientSize', this)">50–200 employees</button>
+          <button class="chip" data-val="large" onclick="selectChip('clientSize', this)">200+ employees</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Input 3: Fee model -->
+      <div class="input-group">
+        <div class="input-label">How would you charge for this service?</div>
+        <div class="input-hint">Pick the model closest to how you'd structure it. You can change this.</div>
+        <div class="chip-group" id="feeModelGroup">
+          <button class="chip active" data-val="annual-review" onclick="selectChip('feeModel', this)">Annual review ($500–$1,500)</button>
+          <button class="chip" data-val="quarterly" onclick="selectChip('feeModel', this)">Quarterly retainer ($300–$600/qtr)</button>
+          <button class="chip" data-val="monthly" onclick="selectChip('feeModel', this)">Monthly retainer ($150–$350/mo)</button>
+          <button class="chip" data-val="project" onclick="selectChip('feeModel', this)">One-off project ($1,000–$3,000)</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Input 4: Uptake -->
+      <div class="input-group">
+        <div class="input-label">
+          What portion of your clients would take this up?
+        </div>
+        <div class="input-hint">Be conservative. Most advisors who offer this find uptake higher than expected.</div>
+        <div class="slider-row">
+          <input type="range" id="uptake" min="10" max="80" value="30" step="5" oninput="update()">
+          <div class="slider-val" id="uptakeVal">30<span style="font-size:16px;font-weight:400;color:var(--muted)">%</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Live results panel -->
+    <div class="results-panel visible" id="resultsPanel">
+      <div class="results-label">Live estimate</div>
+      <div class="result-rows">
+        <div class="result-row">
+          <span class="result-row-label">Clients likely to engage</span>
+          <span class="result-row-val highlight" id="eligibleClients">—</span>
+        </div>
+        <div class="result-row">
+          <span class="result-row-label">Fee per client (midpoint)</span>
+          <span class="result-row-val" id="feePerClient">—</span>
+        </div>
+        <div class="result-row">
+          <span class="result-row-label">Estimated annual revenue</span>
+          <span class="result-row-val green" id="annualRevenue">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full results (shown after a moment) -->
+  <div id="fullResults" style="display:none">
+
+    <div class="main-result">
+      <div class="main-result-label">Estimated annual service line revenue</div>
+      <div class="main-result-amount" id="bigNumber">—</div>
+      <div class="main-result-sub" id="bigNumberSub">Based on your inputs</div>
+    </div>
+
+    <div class="breakdown">
+      <div class="breakdown-title">How this is calculated</div>
+      <div class="breakdown-row">
+        <span>Active clients</span>
+        <span id="bClients">—</span>
+      </div>
+      <div class="breakdown-row">
+        <span>Estimated uptake</span>
+        <span id="bUptake">—</span>
+      </div>
+      <div class="breakdown-row">
+        <span>Clients engaging</span>
+        <span id="bEngaging">—</span>
+      </div>
+      <div class="breakdown-row">
+        <span>Fee model</span>
+        <span id="bFeeModel">—</span>
+      </div>
+      <div class="breakdown-row">
+        <span>Fee per client / year</span>
+        <span id="bFeeAnnual">—</span>
+      </div>
+      <div class="breakdown-row" style="border-top: 1px solid rgba(255,129,227,0.2); margin-top: 4px; padding-top: 14px;">
+        <span style="color: var(--text); font-weight: 600;">Annual revenue estimate</span>
+        <span id="bTotal" style="color: var(--green);">—</span>
+      </div>
+    </div>
+
+    <div class="context-note">
+      <p id="contextText">—</p>
+      <p>These are estimates based on what advisors in AppVentory's network are already charging. The actual number depends on your client relationships and how you position the service.</p>
+    </div>
+
+    <div class="cta-block">
+      <h3 id="ctaH">—</h3>
+      <p id="ctaP">—</p>
+      <div id="ctaForm">
+        <div class="email-row">
+          <input type="email" id="emailInput" placeholder="you@firm.com">
+          <button class="btn" onclick="submitEmail()">Send me the breakdown</button>
+        </div>
+        <div class="cta-note">We'll email you this estimate plus a short guide on how to structure the service.</div>
+      </div>
+      <div class="success-msg" id="successMsg">✓ Check your inbox — we'll send the breakdown shortly.</div>
+      <div class="secondary-cta">
+        <a href="index.html">Or book a 30-minute demo to see AppVentory working with a real client account →</a>
+      </div>
+    </div>
+
+    <div style="text-align:center">
+      <span class="restart-link" onclick="resetCalc()">Reset the calculator</span>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  const state = {
+    clientSize: 'small',
+    feeModel: 'annual-review',
+  };
+
+  const sizeApps = { micro: 8, small: 22, medium: 45, large: 80 };
+
+  const feeModels = {
+    'annual-review':  { label: 'Annual review',         annualFee: 1000, min: 500,   max: 1500  },
+    'quarterly':      { label: 'Quarterly retainer',     annualFee: 1600, min: 1200,  max: 2400  },
+    'monthly':        { label: 'Monthly retainer',       annualFee: 3000, min: 1800,  max: 4200  },
+    'project':        { label: 'One-off project',        annualFee: 1800, min: 1000,  max: 3000  },
+  };
+
+  let fullResultsShown = false;
+  let revealTimer = null;
+
+  function fmt(n) {
+    return '$' + Math.round(n).toLocaleString();
+  }
+
+  function selectChip(key, el) {
+    const group = el.closest('.chip-group');
+    group.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    state[key] = el.dataset.val;
+    update();
+  }
+
+  function update() {
+    const clients = parseInt(document.getElementById('clientCount').value);
+    const uptakePct = parseInt(document.getElementById('uptake').value);
+
+    document.getElementById('clientCountVal').textContent = clients;
+    document.getElementById('uptakeVal').innerHTML = uptakePct + '<span style="font-size:16px;font-weight:400;color:var(--muted)">%</span>';
+
+    const fm = feeModels[state.feeModel];
+    const eligible = Math.round(clients * uptakePct / 100);
+    const annualRevenue = eligible * fm.annualFee;
+
+    // Live panel
+    document.getElementById('eligibleClients').textContent = eligible;
+    document.getElementById('feePerClient').textContent = fmt(fm.annualFee) + '/yr';
+    document.getElementById('annualRevenue').textContent = fmt(annualRevenue);
+
+    // Full results
+    if (fullResultsShown) renderFull(clients, uptakePct, eligible, annualRevenue, fm);
+
+    // Reveal full results after first meaningful interaction
+    clearTimeout(revealTimer);
+    revealTimer = setTimeout(() => {
+      if (!fullResultsShown) {
+        fullResultsShown = true;
+        document.getElementById('fullResults').style.display = 'block';
+        document.getElementById('fullResults').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      renderFull(clients, uptakePct, eligible, annualRevenue, fm);
+    }, 800);
+  }
+
+  function renderFull(clients, uptakePct, eligible, annualRevenue, fm) {
+    document.getElementById('bigNumber').textContent = fmt(annualRevenue);
+    document.getElementById('bigNumberSub').textContent =
+      eligible + ' clients × ' + fmt(fm.annualFee) + '/yr';
+
+    // Breakdown
+    document.getElementById('bClients').textContent = clients;
+    document.getElementById('bUptake').textContent = uptakePct + '%';
+    document.getElementById('bEngaging').textContent = eligible + ' clients';
+    document.getElementById('bFeeModel').textContent = fm.label;
+    document.getElementById('bFeeAnnual').textContent = fmt(fm.annualFee);
+    document.getElementById('bTotal').textContent = fmt(annualRevenue);
+
+    // Context note
+    const ctxEl = document.getElementById('contextText');
+    if (annualRevenue >= 60000) {
+      ctxEl.textContent = 'At ' + eligible + ' clients engaging, this represents a substantial standalone service line — roughly equivalent to 1–2 additional full-time retainer clients, without proportional time investment.';
+    } else if (annualRevenue >= 20000) {
+      ctxEl.textContent = 'At ' + eligible + ' clients engaging, ' + fmt(annualRevenue) + ' is meaningful incremental revenue from work you\'re partly doing already — just without a structured fee attached to it.';
+    } else {
+      ctxEl.textContent = 'Even at conservative uptake, this adds ' + fmt(annualRevenue) + ' to your practice annually. As you systematise the service, the time cost per client drops significantly.';
+    }
+
+    // CTA
+    const ctaH = document.getElementById('ctaH');
+    const ctaP = document.getElementById('ctaP');
+    if (eligible <= 3) {
+      ctaH.textContent = 'Start with two or three clients.';
+      ctaP.textContent = 'A small pilot is the fastest way to understand what the service looks like in practice — and what to charge for it.';
+    } else if (annualRevenue >= 40000) {
+      ctaH.textContent = 'This is worth structuring properly.';
+      ctaP.textContent = fmt(annualRevenue) + ' is enough to treat SaaS advisory as a real service line, not an ad hoc add-on. We can show you how others have set it up.';
+    } else {
+      ctaH.textContent = 'See what the service actually looks like.';
+      ctaP.textContent = 'We\'ll send you this estimate plus a short breakdown of how advisors in AppVentory\'s network have structured and priced SaaS management engagements.';
+    }
+  }
+
+  function submitEmail() {
+    const email = document.getElementById('emailInput').value;
+    if (!email || !email.includes('@')) {
+      document.getElementById('emailInput').style.borderColor = '#e74c3c';
+      return;
+    }
+    document.getElementById('ctaForm').style.display = 'none';
+    document.getElementById('successMsg').style.display = 'block';
+    console.log('Lead captured:', email, state);
+  }
+
+  function resetCalc() {
+    document.getElementById('clientCount').value = 20;
+    document.getElementById('uptake').value = 30;
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    document.querySelector('[data-val="small"]').classList.add('active');
+    document.querySelector('[data-val="annual-review"]').classList.add('active');
+    state.clientSize = 'small';
+    state.feeModel = 'annual-review';
+    fullResultsShown = false;
+    document.getElementById('fullResults').style.display = 'none';
+    document.getElementById('ctaForm').style.display = '';
+    document.getElementById('successMsg').style.display = 'none';
+    document.getElementById('emailInput').value = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    update();
+  }
+
+  // Init
+  update();
+</script>
+</body>
+</html>

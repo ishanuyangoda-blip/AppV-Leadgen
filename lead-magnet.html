@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SaaS Stack Diagnostic — AppVentory</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --brand: #FF81E3;
+    --brand-dark: #e060c8;
+    --brand-light: #FFCDF4;
+    --brand-deep: #1C2C44;
+    --text: #1C2C44;
+    --text-muted: #5a6578;
+    --bg: #FFEBFB;
+    --card: #ffffff;
+    --border: #FFCDF4;
+    --red: #c0392b;
+    --amber: #d4880f;
+    --green: #1C2C44;
+    --radius: 10px;
+    --cream: #F7F3EA;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 24px 20px 48px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 40px 0 32px;
+  }
+
+  .header .logo {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--brand-deep);
+    letter-spacing: -0.3px;
+    margin-bottom: 20px;
+  }
+
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--text);
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+  }
+
+  .header p {
+    font-size: 16px;
+    color: var(--text-muted);
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* Progress */
+  .progress-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 24px 0 32px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--brand-deep);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .step-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+
+  /* Question cards */
+  .question-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px 28px;
+    display: none;
+  }
+
+  .question-card.active { display: block; }
+
+  .question-card h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+  }
+
+  .question-card .subtext {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+
+  /* Options */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-size: 15px;
+    background: var(--card);
+  }
+
+  .option:hover { border-color: var(--brand); background: #FFF0FB; }
+  .option.selected { border-color: var(--brand); background: var(--brand-light); }
+
+  .option .radio {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+  }
+
+  .option.selected .radio {
+    border-color: var(--brand-deep);
+    background: var(--brand-deep);
+  }
+
+  .option.selected .radio::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+  }
+
+  /* Slider input */
+  .slider-group { margin-top: 8px; }
+
+  .slider-group input[type="range"] {
+    width: 100%;
+    margin: 12px 0;
+    accent-color: var(--brand-deep);
+    height: 6px;
+  }
+
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .slider-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--brand-deep);
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  .slider-value span {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--text-muted);
+  }
+
+  /* Navigation */
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+  }
+
+  .btn {
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s ease;
+  }
+
+  .btn-primary {
+    background: var(--brand-deep);
+    color: white;
+  }
+
+  .btn-primary:hover { background: #253a56; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-back {
+    background: none;
+    color: var(--text-muted);
+    padding: 12px 16px;
+  }
+
+  .btn-back:hover { color: var(--text); }
+
+  /* Results */
+  .results-screen { display: none; }
+  .results-screen.active { display: block; }
+
+  .score-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 28px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .score-ring {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 20px;
+    position: relative;
+  }
+
+  .score-ring svg { transform: rotate(-90deg); }
+
+  .score-ring .score-number {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 36px;
+    font-weight: 700;
+  }
+
+  .score-label {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .score-summary {
+    font-size: 15px;
+    color: var(--text-muted);
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  /* Finding cards */
+  .finding {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 12px;
+  }
+
+  .finding-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .finding-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .finding-icon.red { background: #fdecea; color: var(--red); }
+  .finding-icon.amber { background: #fef5e7; color: var(--amber); }
+  .finding-icon.green { background: var(--brand-light); color: var(--brand-deep); }
+
+  .finding h3 { font-size: 16px; font-weight: 600; }
+
+  .finding p {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-left: 38px;
+  }
+
+  .estimated-cost {
+    background: var(--cream);
+    border: 1px solid #e8dfd2;
+    border-radius: var(--radius);
+    padding: 24px;
+    margin: 24px 0;
+    text-align: center;
+  }
+
+  .estimated-cost .amount {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--brand-deep);
+    margin-bottom: 4px;
+  }
+
+  .estimated-cost .label {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  /* CTA */
+  .cta-card {
+    background: var(--brand-deep);
+    border-radius: var(--radius);
+    padding: 36px 28px;
+    text-align: center;
+    margin-top: 24px;
+  }
+
+  .cta-card h3 {
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .cta-card p {
+    color: rgba(255,255,255,0.8);
+    font-size: 15px;
+    margin-bottom: 24px;
+  }
+
+  .email-row {
+    display: flex;
+    gap: 8px;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  .email-row input {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: none;
+    font-size: 15px;
+    outline: none;
+  }
+
+  .email-row input::placeholder { color: #999; }
+
+  .email-row .btn {
+    background: var(--brand);
+    color: var(--brand-deep);
+    white-space: nowrap;
+    font-weight: 700;
+  }
+
+  .email-row .btn:hover { background: var(--brand-dark); }
+
+  .cta-note {
+    color: rgba(255,255,255,0.6);
+    font-size: 12px;
+    margin-top: 12px;
+  }
+
+  .success-msg {
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    display: none;
+    padding: 16px 0;
+  }
+
+  .restart-link {
+    display: inline-block;
+    margin-top: 24px;
+    color: var(--brand);
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  /* Mobile */
+  @media (max-width: 480px) {
+    .container { padding: 16px 16px 40px; }
+    .header h1 { font-size: 24px; }
+    .question-card { padding: 24px 20px; }
+    .score-card { padding: 28px 20px; }
+    .email-row { flex-direction: column; }
+    .email-row .btn { width: 100%; }
+    .cta-card { padding: 28px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">AppVentory</div>
+    <h1>How healthy is your client's SaaS stack?</h1>
+    <p>Answer 6 quick questions. Get a personalised diagnostic with specific findings you can act on.</p>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="step-label" id="stepLabel">Question 1 of 6</div>
+
+  <!-- Q1: How many apps -->
+  <div class="question-card active" data-step="1">
+    <h2>How many SaaS tools does the business use?</h2>
+    <p class="subtext">Include everything: accounting, CRM, project management, communication, design, etc.</p>
+    <div class="slider-group">
+      <div class="slider-value" id="appCountDisplay">25 <span>apps</span></div>
+      <input type="range" id="appCount" min="5" max="100" value="25" step="5">
+      <div class="slider-labels"><span>5</span><span>50</span><span>100+</span></div>
+    </div>
+    <div class="nav-row">
+      <div></div>
+      <button class="btn btn-primary" onclick="nextStep()">Next</button>
+    </div>
+  </div>
+
+  <!-- Q2: Monthly spend -->
+  <div class="question-card" data-step="2">
+    <h2>What's the estimated monthly SaaS spend?</h2>
+    <p class="subtext">Your best guess is fine. Include all recurring software subscriptions.</p>
+    <div class="options">
+      <div class="option" onclick="selectOption(this, 'spend', 'under2k')">
+        <div class="radio"></div>Under $2,000/mo
+      </div>
+      <div class="option" onclick="selectOption(this, 'spend', '2k-5k')">
+        <div class="radio"></div>$2,000 – $5,000/mo
+      </div>
+      <div class="option" onclick="selectOption(this, 'spend', '5k-15k')">
+        <div class="radio"></div>$5,000 – $15,000/mo
+      </div>
+      <div class="option" onclick="selectOption(this, 'spend', '15k-plus')">
+        <div class="radio"></div>$15,000+/mo
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-back" onclick="prevStep()">Back</button>
+      <button class="btn btn-primary" id="btn2" disabled onclick="nextStep()">Next</button>
+    </div>
+  </div>
+
+  <!-- Q3: Tracking method -->
+  <div class="question-card" data-step="3">
+    <h2>How are subscriptions currently tracked?</h2>
+    <p class="subtext">Pick the option closest to how things work today.</p>
+    <div class="options">
+      <div class="option" onclick="selectOption(this, 'tracking', 'not-tracked')">
+        <div class="radio"></div>They're not — nobody has a full picture
+      </div>
+      <div class="option" onclick="selectOption(this, 'tracking', 'spreadsheet')">
+        <div class="radio"></div>Spreadsheet or document (manually updated)
+      </div>
+      <div class="option" onclick="selectOption(this, 'tracking', 'accounting')">
+        <div class="radio"></div>We check the accounting software when needed
+      </div>
+      <div class="option" onclick="selectOption(this, 'tracking', 'tool')">
+        <div class="radio"></div>We use a dedicated SaaS management tool
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-back" onclick="prevStep()">Back</button>
+      <button class="btn btn-primary" id="btn3" disabled onclick="nextStep()">Next</button>
+    </div>
+  </div>
+
+  <!-- Q4: Renewal awareness -->
+  <div class="question-card" data-step="4">
+    <h2>Do you know when renewals are coming up?</h2>
+    <p class="subtext">Think about the next 90 days — could you list every renewal and its date?</p>
+    <div class="options">
+      <div class="option" onclick="selectOption(this, 'renewals', 'no-idea')">
+        <div class="radio"></div>No — renewals happen and we find out after
+      </div>
+      <div class="option" onclick="selectOption(this, 'renewals', 'some')">
+        <div class="radio"></div>We know the big ones, but not the smaller tools
+      </div>
+      <div class="option" onclick="selectOption(this, 'renewals', 'mostly')">
+        <div class="radio"></div>We have a rough calendar, but it's not complete
+      </div>
+      <div class="option" onclick="selectOption(this, 'renewals', 'yes')">
+        <div class="radio"></div>Yes — every renewal is tracked with dates and amounts
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-back" onclick="prevStep()">Back</button>
+      <button class="btn btn-primary" id="btn4" disabled onclick="nextStep()">Next</button>
+    </div>
+  </div>
+
+  <!-- Q5: Overlap / duplication -->
+  <div class="question-card" data-step="5">
+    <h2>Are there tools that do the same thing?</h2>
+    <p class="subtext">Overlapping tools are common — e.g., Slack and Teams, Asana and Monday, Dropbox and Google Drive.</p>
+    <div class="options">
+      <div class="option" onclick="selectOption(this, 'overlap', 'definitely')">
+        <div class="radio"></div>Definitely — there are overlapping tools
+      </div>
+      <div class="option" onclick="selectOption(this, 'overlap', 'probably')">
+        <div class="radio"></div>Probably, but nobody's checked properly
+      </div>
+      <div class="option" onclick="selectOption(this, 'overlap', 'unlikely')">
+        <div class="radio"></div>Unlikely — the stack is fairly lean
+      </div>
+      <div class="option" onclick="selectOption(this, 'overlap', 'no')">
+        <div class="radio"></div>No — every tool has a distinct purpose
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-back" onclick="prevStep()">Back</button>
+      <button class="btn btn-primary" id="btn5" disabled onclick="nextStep()">Next</button>
+    </div>
+  </div>
+
+  <!-- Q6: User context -->
+  <div class="question-card" data-step="6">
+    <h2>Who are you doing this for?</h2>
+    <p class="subtext">This helps us tailor the findings.</p>
+    <div class="options">
+      <div class="option" onclick="selectOption(this, 'role', 'advisor')">
+        <div class="radio"></div>I'm an advisor reviewing a client's stack
+      </div>
+      <div class="option" onclick="selectOption(this, 'role', 'founder')">
+        <div class="radio"></div>I'm a founder or operator managing my own business
+      </div>
+      <div class="option" onclick="selectOption(this, 'role', 'finance')">
+        <div class="radio"></div>I'm in finance trying to get costs under control
+      </div>
+      <div class="option" onclick="selectOption(this, 'role', 'it')">
+        <div class="radio"></div>I'm in IT or operations
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-back" onclick="prevStep()">Back</button>
+      <button class="btn btn-primary" id="btn6" disabled onclick="showResults()">See my results</button>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="results-screen" id="resultsScreen">
+    <div class="score-card">
+      <div class="score-ring">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="52" fill="none" stroke="#e0e0e0" stroke-width="8"/>
+          <circle id="scoreArc" cx="60" cy="60" r="52" fill="none" stroke-width="8" stroke-linecap="round"
+            stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+        </svg>
+        <div class="score-number" id="scoreNumber">--</div>
+      </div>
+      <div class="score-label" id="scoreLabel"></div>
+      <div class="score-summary" id="scoreSummary"></div>
+    </div>
+
+    <div id="findingsContainer"></div>
+
+    <div class="estimated-cost" id="costEstimate">
+      <div class="amount" id="costAmount"></div>
+      <div class="label" id="costLabel"></div>
+    </div>
+
+    <div class="cta-card">
+      <h3 id="ctaHeadline"></h3>
+      <p id="ctaSubtext"></p>
+      <div id="ctaForm">
+        <div class="email-row">
+          <input type="email" id="emailInput" placeholder="you@company.com">
+          <button class="btn" onclick="submitEmail()">Get my full report</button>
+        </div>
+        <div class="cta-note">No spam. Just your personalised diagnostic breakdown.</div>
+      </div>
+      <div class="success-msg" id="successMsg">
+        &#10003; We'll send your full report shortly.
+      </div>
+    </div>
+
+    <div style="text-align: center;">
+      <span class="restart-link" onclick="restart()">Retake the diagnostic</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentStep = 1;
+  const totalSteps = 6;
+  const answers = {};
+
+  const appSlider = document.getElementById('appCount');
+  const appDisplay = document.getElementById('appCountDisplay');
+
+  appSlider.addEventListener('input', () => {
+    const v = appSlider.value;
+    appDisplay.innerHTML = v >= 100 ? '100+ <span>apps</span>' : v + ' <span>apps</span>';
+  });
+
+  function selectOption(el, key, value) {
+    const card = el.closest('.question-card');
+    card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    answers[key] = value;
+    const btn = card.querySelector('.btn-primary');
+    if (btn) btn.disabled = false;
+  }
+
+  function updateProgress() {
+    const pct = ((currentStep - 1) / totalSteps) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('stepLabel').textContent = 'Question ' + currentStep + ' of ' + totalSteps;
+  }
+
+  function showStep(n) {
+    document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
+    document.querySelector('[data-step="' + n + '"]').classList.add('active');
+    updateProgress();
+  }
+
+  function nextStep() {
+    if (currentStep === 1) answers.appCount = parseInt(appSlider.value);
+    if (currentStep < totalSteps) { currentStep++; showStep(currentStep); }
+  }
+
+  function prevStep() {
+    if (currentStep > 1) { currentStep--; showStep(currentStep); }
+  }
+
+  function calcScore() {
+    let score = 100;
+
+    // App count risk
+    if (answers.appCount >= 60) score -= 20;
+    else if (answers.appCount >= 35) score -= 12;
+    else if (answers.appCount >= 20) score -= 6;
+
+    // Spend level
+    if (answers.spend === '15k-plus') score -= 10;
+    else if (answers.spend === '5k-15k') score -= 6;
+    else if (answers.spend === '2k-5k') score -= 3;
+
+    // Tracking method
+    if (answers.tracking === 'not-tracked') score -= 25;
+    else if (answers.tracking === 'spreadsheet') score -= 15;
+    else if (answers.tracking === 'accounting') score -= 8;
+
+    // Renewals
+    if (answers.renewals === 'no-idea') score -= 20;
+    else if (answers.renewals === 'some') score -= 12;
+    else if (answers.renewals === 'mostly') score -= 5;
+
+    // Overlap
+    if (answers.overlap === 'definitely') score -= 18;
+    else if (answers.overlap === 'probably') score -= 12;
+    else if (answers.overlap === 'unlikely') score -= 3;
+
+    return Math.max(10, Math.min(100, score));
+  }
+
+  function getSpendMonthly() {
+    const map = { 'under2k': 1500, '2k-5k': 3500, '5k-15k': 10000, '15k-plus': 22000 };
+    return map[answers.spend] || 3500;
+  }
+
+  function buildFindings(score) {
+    const findings = [];
+
+    // Tracking finding
+    if (answers.tracking === 'not-tracked' || answers.tracking === 'spreadsheet') {
+      findings.push({
+        severity: 'red',
+        icon: '!',
+        title: 'No reliable subscription inventory',
+        desc: answers.tracking === 'not-tracked'
+          ? 'Without any tracking, subscriptions accumulate unnoticed. Businesses in this position typically have 20–40% more active subscriptions than anyone realises.'
+          : 'Manual spreadsheets go stale within weeks. They miss new sign-ups, price changes, and cancelled tools that keep billing.'
+      });
+    } else if (answers.tracking === 'accounting') {
+      findings.push({
+        severity: 'amber',
+        icon: '~',
+        title: 'Accounting data is underutilised',
+        desc: 'The spending data is there — it\'s just not being structured into a live inventory. This is actually the fastest path to full discovery.'
+      });
+    }
+
+    // Renewal finding
+    if (answers.renewals === 'no-idea' || answers.renewals === 'some') {
+      findings.push({
+        severity: 'red',
+        icon: '!',
+        title: 'Renewal blind spots',
+        desc: answers.renewals === 'no-idea'
+          ? 'Auto-renewals are running unchecked. This is the single biggest source of preventable SaaS waste — tools renew at full price with nobody reviewing them.'
+          : 'The smaller tools add up. Missed renewals on $50–$300/mo subscriptions compound quickly across a full stack.'
+      });
+    } else if (answers.renewals === 'mostly') {
+      findings.push({
+        severity: 'amber',
+        icon: '~',
+        title: 'Renewal tracking has gaps',
+        desc: 'Most renewals are known, but the incomplete ones tend to be the ones that slip through without review.'
+      });
+    }
+
+    // Overlap finding
+    if (answers.overlap === 'definitely' || answers.overlap === 'probably') {
+      findings.push({
+        severity: answers.overlap === 'definitely' ? 'red' : 'amber',
+        icon: answers.overlap === 'definitely' ? '!' : '~',
+        title: 'Likely tool duplication',
+        desc: answers.overlap === 'definitely'
+          ? 'Known overlaps mean there\'s spend going to tools that could be consolidated. Even one duplicate tool at $200/mo is $2,400/yr with no return.'
+          : 'Unchecked overlap is common — most businesses discover 2–5 tools doing the same job once they look properly.'
+      });
+    }
+
+    // Scale finding
+    if (answers.appCount >= 35) {
+      findings.push({
+        severity: 'amber',
+        icon: '~',
+        title: 'Stack complexity is high',
+        desc: answers.appCount + ' tools is a large stack for an SMB. Without structured management, each new tool adds cost and risk without anyone evaluating the full picture.'
+      });
+    }
+
+    // Positive finding
+    if (score >= 70) {
+      findings.push({
+        severity: 'green',
+        icon: '✓',
+        title: 'Some fundamentals are in place',
+        desc: 'The business has some tracking and awareness. The opportunity is to move from ad hoc checks to a structured, ongoing process.'
+      });
+    }
+
+    return findings;
+  }
+
+  function showResults() {
+    const score = calcScore();
+    const monthly = getSpendMonthly();
+    const findings = buildFindings(score);
+
+    // Hide question UI
+    document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
+    document.querySelector('.progress-bar').style.display = 'none';
+    document.getElementById('stepLabel').style.display = 'none';
+
+    // Score ring
+    const arc = document.getElementById('scoreArc');
+    const circumference = 326.7;
+    const offset = circumference - (score / 100) * circumference;
+    let ringColor = score >= 70 ? '#1C2C44' : score >= 45 ? '#d4880f' : '#c0392b';
+    arc.style.stroke = ringColor;
+
+    const scoreEl = document.getElementById('scoreNumber');
+    scoreEl.style.color = ringColor;
+
+    // Animate score
+    setTimeout(() => { arc.style.transition = 'stroke-dashoffset 1s ease'; arc.style.strokeDashoffset = offset; }, 50);
+    let counter = 0;
+    const target = score;
+    const interval = setInterval(() => {
+      counter += 1;
+      scoreEl.textContent = counter;
+      if (counter >= target) clearInterval(interval);
+    }, 15);
+
+    // Score label
+    const labelEl = document.getElementById('scoreLabel');
+    const summaryEl = document.getElementById('scoreSummary');
+    if (score >= 70) {
+      labelEl.textContent = 'Moderate risk';
+      summaryEl.textContent = 'The foundations are there, but there are clear gaps that are likely costing money. A structured review would surface specific savings.';
+    } else if (score >= 45) {
+      labelEl.textContent = 'Significant risk';
+      summaryEl.textContent = 'Multiple areas of the stack are unmanaged. Subscriptions are renewing, overlapping, and accumulating without oversight.';
+    } else {
+      labelEl.textContent = 'High risk';
+      summaryEl.textContent = 'This stack is largely unmanaged. There is almost certainly meaningful spend going to tools that are unused, duplicated, or overpriced.';
+    }
+
+    // Findings
+    const container = document.getElementById('findingsContainer');
+    container.innerHTML = '';
+    findings.forEach(f => {
+      container.innerHTML += '<div class="finding"><div class="finding-header"><div class="finding-icon ' + f.severity + '">' + f.icon + '</div><h3>' + f.title + '</h3></div><p>' + f.desc + '</p></div>';
+    });
+
+    // Cost estimate
+    const wasteRate = score >= 70 ? 0.12 : score >= 45 ? 0.22 : 0.32;
+    const annualWaste = Math.round(monthly * 12 * wasteRate);
+    document.getElementById('costAmount').textContent = '$' + annualWaste.toLocaleString();
+    document.getElementById('costLabel').textContent = 'Estimated annual savings opportunity based on your answers';
+
+    // CTA personalisation
+    const ctaH = document.getElementById('ctaHeadline');
+    const ctaS = document.getElementById('ctaSubtext');
+    if (answers.role === 'advisor') {
+      ctaH.textContent = 'Turn this into a client deliverable';
+      ctaS.textContent = 'AppVentory runs this diagnostic automatically — using your client\'s accounting data. Get findings you can present, not just a score.';
+    } else {
+      ctaH.textContent = 'See the full picture — from your actual data';
+      ctaS.textContent = 'This diagnostic is based on estimates. AppVentory connects to your accounting software and shows you exactly where money is going.';
+    }
+
+    // Show results
+    document.getElementById('resultsScreen').classList.add('active');
+    document.querySelector('.header h1').textContent = 'Your SaaS Stack Diagnostic';
+    document.querySelector('.header p').textContent = 'Here\'s what we found based on your answers.';
+  }
+
+  function submitEmail() {
+    const email = document.getElementById('emailInput').value;
+    if (!email || !email.includes('@')) {
+      document.getElementById('emailInput').style.borderColor = 'var(--red)';
+      return;
+    }
+    document.getElementById('ctaForm').style.display = 'none';
+    document.getElementById('successMsg').style.display = 'block';
+    // In production: send email to your backend / CRM
+    console.log('Lead captured:', email, answers);
+  }
+
+  function restart() {
+    currentStep = 1;
+    Object.keys(answers).forEach(k => delete answers[k]);
+    document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+    document.querySelectorAll('.btn-primary').forEach(b => { if (b.id) b.disabled = true; });
+    appSlider.value = 25;
+    appDisplay.innerHTML = '25 <span>apps</span>';
+    document.getElementById('resultsScreen').classList.remove('active');
+    document.querySelector('.progress-bar').style.display = '';
+    document.getElementById('stepLabel').style.display = '';
+    document.querySelector('.header h1').textContent = 'How healthy is your client\'s SaaS stack?';
+    document.querySelector('.header p').textContent = 'Answer 6 quick questions. Get a personalised diagnostic with specific findings you can act on.';
+    document.getElementById('ctaForm').style.display = '';
+    document.getElementById('successMsg').style.display = 'none';
+    document.getElementById('scoreArc').style.transition = 'none';
+    document.getElementById('scoreArc').style.strokeDashoffset = '326.7';
+    showStep(1);
+  }
+
+  updateProgress();
+</script>
+</body>
+</html>

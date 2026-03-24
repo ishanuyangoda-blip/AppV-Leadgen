@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AppVentory — SaaS Management for Advisors</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:          #0d1520;
+  --surface:     #162032;
+  --surface-2:   #1e2f47;
+  --pink:        #FF81E3;
+  --pink-dim:    rgba(255,129,227,0.10);
+  --pink-border: rgba(255,129,227,0.22);
+  --white:       #ffffff;
+  --text:        #dde4ee;       /* slightly warmer, easier to read */
+  --text-muted:  #8fa3bc;       /* lifted from #7a8fa8 for contrast */
+  --border:      rgba(255,255,255,0.075);
+  --border-hi:   rgba(255,255,255,0.13);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  font-size: 16px;
+}
+
+/* ─── NAV ─── */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(13,21,32,0.90);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 6%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 66px;
+}
+
+.nav-logo {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--white);
+  text-decoration: none;
+  letter-spacing: -0.3px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.nav-link {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.nav-link:hover { color: var(--white); }
+
+.nav-cta {
+  background: var(--pink);
+  color: var(--bg);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 10px 22px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+.nav-cta:hover { opacity: 0.85; }
+
+/* ─── HERO ─── */
+.hero {
+  padding: 120px 6% 96px;
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 700px; height: 500px;
+  background: radial-gradient(ellipse at 50% 30%, rgba(255,129,227,0.06) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pink);
+  border: 1px solid var(--pink-border);
+  padding: 6px 16px;
+  border-radius: 20px;
+  margin-bottom: 28px;
+}
+
+.hero h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 900;
+  font-size: clamp(42px, 6.5vw, 76px);
+  line-height: 1.03;
+  letter-spacing: -2.5px;
+  color: var(--white);
+  margin-bottom: 26px;
+}
+
+.hero h1 em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--pink);
+}
+
+.hero-sub {
+  font-size: 18px;
+  color: var(--text-muted);
+  line-height: 1.75;
+  margin-bottom: 48px;
+  max-width: 580px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 56px;
+}
+
+.btn-primary {
+  background: var(--pink);
+  color: var(--bg);
+  font-weight: 700;
+  font-size: 15px;
+  padding: 15px 32px;
+  border-radius: 10px;
+  text-decoration: none;
+  display: inline-block;
+  transition: opacity 0.15s, transform 0.1s;
+  letter-spacing: -0.1px;
+}
+.btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+.btn-outline {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  border: 1px solid var(--border-hi);
+  padding: 14px 24px;
+  border-radius: 10px;
+  transition: border-color 0.15s, color 0.15s;
+}
+.btn-outline:hover { color: var(--white); border-color: var(--pink-border); }
+
+.hero-proof {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+
+.proof-avatars { display: flex; }
+.proof-avatars span {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 2px solid var(--bg);
+  margin-left: -9px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--pink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.proof-copy { font-size: 14px; color: var(--text-muted); }
+.proof-copy strong { color: var(--text); font-weight: 600; }
+
+/* ─── TOOLS SECTION ─── */
+.tools-section {
+  background: var(--surface);
+  padding: 88px 6%;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.tools-inner { max-width: 1060px; margin: 0 auto; }
+
+.tools-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.tools-heading {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: clamp(26px, 3vw, 36px);
+  color: var(--white);
+  letter-spacing: -0.6px;
+  line-height: 1.15;
+}
+
+.tools-subhead {
+  font-size: 15px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  max-width: 420px;
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.tool-card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.15s;
+}
+.tool-card:hover {
+  border-color: var(--pink-border);
+  transform: translateY(-2px);
+}
+
+/* Tool card preview area */
+.tool-preview {
+  padding: 28px 28px 20px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  min-height: 180px;
+  position: relative;
+  overflow: hidden;
+}
+
+.tool-preview::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 40px;
+  background: linear-gradient(to bottom, transparent, var(--surface-2));
+}
+
+/* Diagnostic preview mock */
+.preview-score {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.score-circle {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  border: 3px solid var(--pink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.score-circle span {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--pink);
+}
+
+.score-findings { flex: 1; }
+
+.score-finding-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.finding-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-red   { background: #e74c3c; }
+.dot-amber { background: #f39c12; }
+.dot-green { background: var(--pink); }
+
+.finding-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Calculator preview mock */
+.preview-calc {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.calc-row-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  letter-spacing: 0.04em;
+}
+
+.calc-slider-mock {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  position: relative;
+  margin-bottom: 4px;
+}
+
+.calc-slider-mock::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0;
+  width: 55%;
+  height: 100%;
+  background: var(--pink);
+  border-radius: 2px;
+}
+
+.calc-slider-mock .thumb {
+  position: absolute;
+  top: 50%;
+  left: 55%;
+  transform: translate(-50%, -50%);
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--pink);
+  border: 2px solid var(--bg);
+}
+
+.calc-result-mock {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.calc-result-mock .amount {
+  font-family: 'Fraunces', serif;
+  font-size: 32px;
+  font-weight: 900;
+  color: #3ecf8e;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.calc-result-mock .sublabel {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Tool card body */
+.tool-body {
+  padding: 28px 28px 32px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.tool-type {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pink);
+  margin-bottom: 10px;
+}
+
+.tool-card h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: -0.4px;
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+
+.tool-card p {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 24px;
+  flex: 1;
+}
+
+.tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-hi);
+  color: var(--white);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  transition: background 0.15s, border-color 0.15s;
+  align-self: flex-start;
+}
+.tool-card:hover .tool-btn {
+  background: rgba(255,129,227,0.12);
+  border-color: var(--pink-border);
+  color: var(--pink);
+}
+
+/* ─── PROBLEM ─── */
+.problem {
+  background: var(--bg);
+  padding: 96px 6%;
+}
+
+.problem-inner { max-width: 1060px; margin: 0 auto; }
+
+.section-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pink);
+  margin-bottom: 16px;
+}
+
+.section-h2 {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: clamp(28px, 3.5vw, 46px);
+  letter-spacing: -1px;
+  line-height: 1.12;
+  color: var(--white);
+  margin-bottom: 16px;
+  max-width: 640px;
+}
+
+.section-sub {
+  font-size: 16px;
+  color: var(--text-muted);
+  max-width: 500px;
+  margin-bottom: 56px;
+  line-height: 1.75;
+}
+
+.problem-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.problem-item {
+  background: var(--surface);
+  padding: 44px 36px;
+}
+
+.problem-num {
+  font-family: 'Fraunces', serif;
+  font-size: 36px;
+  font-weight: 900;
+  -webkit-text-stroke: 1px rgba(255,129,227,0.25);
+  color: transparent;
+  line-height: 1;
+  margin-bottom: 20px;
+  letter-spacing: -2px;
+}
+
+.problem-item h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.problem-item p {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.75;
+}
+
+/* ─── BENEFITS ─── */
+.benefits {
+  background: var(--surface);
+  padding: 96px 6%;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.benefits-inner { max-width: 1060px; margin: 0 auto; }
+.benefits-header { margin-bottom: 56px; }
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.benefit-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 36px 28px;
+  transition: border-color 0.2s;
+}
+.benefit-card:hover { border-color: var(--pink-border); }
+
+.benefit-marker {
+  width: 28px; height: 2px;
+  background: var(--pink);
+  margin-bottom: 24px;
+  border-radius: 1px;
+}
+
+.benefit-card h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--white);
+  margin-bottom: 12px;
+  line-height: 1.25;
+}
+
+.benefit-card p {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.75;
+}
+
+/* ─── HOW IT WORKS ─── */
+.how {
+  background: var(--bg);
+  padding: 96px 6%;
+}
+
+.how-inner { max-width: 1060px; margin: 0 auto; }
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 36px;
+  margin-top: 56px;
+  position: relative;
+}
+
+.steps::before {
+  content: '';
+  position: absolute;
+  top: 18px;
+  left: calc(16.66% + 20px);
+  right: calc(16.66% + 20px);
+  height: 1px;
+  background: var(--pink-border);
+}
+
+.step { position: relative; }
+
+.step-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--pink);
+  margin-bottom: 28px;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 0 0 4px rgba(255,129,227,0.12);
+}
+
+.step h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.step p {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.75;
+}
+
+/* ─── PROOF ─── */
+.proof {
+  background: var(--surface);
+  padding: 96px 6%;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.proof-inner { max-width: 960px; margin: 0 auto; }
+
+.proof-stat-row {
+  display: flex;
+  gap: 56px;
+  margin-bottom: 64px;
+  flex-wrap: wrap;
+  padding-bottom: 56px;
+  border-bottom: 1px solid var(--border);
+}
+
+.stat-num {
+  font-family: 'Fraunces', serif;
+  font-size: 52px;
+  font-weight: 900;
+  color: var(--white);
+  letter-spacing: -2.5px;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.testimonial {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 48px 44px;
+}
+
+.testimonial-text {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(18px, 2.2vw, 24px);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--text);
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+.testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.author-avatar {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: var(--pink-dim);
+  border: 1px solid var(--pink-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--pink);
+  flex-shrink: 0;
+}
+
+.author-name { font-weight: 600; font-size: 15px; color: var(--white); }
+.author-title { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+/* ─── CTA ─── */
+.cta-section {
+  background: var(--bg);
+  padding: 104px 6%;
+}
+
+.cta-inner { max-width: 640px; margin: 0 auto; }
+
+.cta-inner .section-h2 { margin-bottom: 16px; max-width: 100%; }
+.cta-inner .section-sub { margin-bottom: 40px; max-width: 100%; }
+
+.cta-friction {
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.skeptic {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 32px 36px;
+  margin-top: 52px;
+}
+
+.skeptic-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pink);
+  margin-bottom: 14px;
+}
+
+.skeptic p {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+.skeptic p + p { margin-top: 14px; }
+
+/* ─── FOOTER ─── */
+footer {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 40px 6%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-logo {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--white);
+  text-decoration: none;
+}
+
+.footer-copy { font-size: 13px; color: var(--text-muted); }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 900px) {
+  .hero { padding: 88px 5% 72px; }
+  .tools-grid,
+  .problem-grid,
+  .benefits-grid,
+  .steps { grid-template-columns: 1fr; }
+  .steps::before { display: none; }
+  .problem-grid { gap: 1px; }
+  .proof-stat-row { gap: 36px; }
+  .tools-header { flex-direction: column; align-items: flex-start; }
+}
+
+@media (max-width: 600px) {
+  nav { padding: 0 20px; }
+  .nav-links .nav-link { display: none; }
+  .hero { padding: 72px 20px 64px; }
+  .hero h1 { letter-spacing: -1.5px; }
+  .problem, .benefits, .how, .proof, .cta-section { padding: 72px 20px; }
+  .tools-section { padding: 72px 20px; }
+  .problem-item { padding: 32px 24px; }
+  .benefit-card { padding: 28px 22px; }
+  .skeptic, .testimonial { padding: 28px 22px; }
+  footer { padding: 32px 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">AppVentory</a>
+  <div class="nav-links">
+    <a href="#tools" class="nav-link">Free tools</a>
+    <a href="#how" class="nav-link">How it works</a>
+    <a href="#demo" class="nav-cta">Book a demo</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="eyebrow">For accountants &amp; tech advisors</div>
+  <h1>See what your clients are spending on software. <em>Actually see it.</em></h1>
+  <p class="hero-sub">AppVentory reads your clients' accounting data and builds a complete picture of their SaaS stack — every subscription, renewal, and duplicate — without needing IT access or enterprise infrastructure.</p>
+  <div class="hero-actions">
+    <a href="#demo" class="btn-primary">Book a demo</a>
+    <a href="#tools" class="btn-outline">Try the free tools ↓</a>
+  </div>
+  <div class="hero-proof">
+    <div class="proof-avatars">
+      <span>A</span><span>B</span><span>C</span><span>+</span>
+    </div>
+    <div class="proof-copy"><strong>20+ advisory firms</strong> using AppVentory</div>
+  </div>
+</section>
+
+<!-- FREE TOOLS -->
+<section class="tools-section" id="tools">
+  <div class="tools-inner">
+    <div class="tools-header">
+      <div>
+        <div class="section-label">Free tools</div>
+        <div class="tools-heading">Two things you can use right now.</div>
+        <div class="tools-subhead">No account, no signup. See what the platform surfaces before committing to a demo.</div>
+      </div>
+    </div>
+
+    <div class="tools-grid">
+
+      <!-- Tool 1: Diagnostic -->
+      <a href="lead-magnet.html" class="tool-card">
+        <div class="tool-preview">
+          <div class="preview-score">
+            <div class="score-circle"><span>42</span></div>
+            <div class="score-findings">
+              <div class="score-finding-row">
+                <div class="finding-dot dot-red"></div>
+                <span class="finding-text">No reliable subscription inventory</span>
+              </div>
+              <div class="score-finding-row">
+                <div class="finding-dot dot-red"></div>
+                <span class="finding-text">Renewal blind spots identified</span>
+              </div>
+              <div class="score-finding-row">
+                <div class="finding-dot dot-amber"></div>
+                <span class="finding-text">Likely tool duplication</span>
+              </div>
+              <div class="score-finding-row">
+                <div class="finding-dot dot-green"></div>
+                <span class="finding-text">Est. $18,400 savings opportunity</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tool-body">
+          <div class="tool-type">Diagnostic · 6 questions</div>
+          <h3>SaaS Stack Diagnostic</h3>
+          <p>Answer 6 questions about a client's stack. Get a risk score, specific findings, and an estimated savings opportunity — in under 2 minutes.</p>
+          <div class="tool-btn">Run the diagnostic →</div>
+        </div>
+      </a>
+
+      <!-- Tool 2: Calculator -->
+      <a href="advisory-calculator.html" class="tool-card">
+        <div class="tool-preview">
+          <div class="preview-calc">
+            <div>
+              <div class="calc-row-label">Active clients — 28</div>
+              <div class="calc-slider-mock"><div class="thumb"></div></div>
+            </div>
+            <div>
+              <div class="calc-row-label">Estimated uptake — 35%</div>
+              <div class="calc-slider-mock" style="--fill: 35%">
+                <div class="thumb" style="left:35%"></div>
+              </div>
+            </div>
+            <div class="calc-result-mock">
+              <span class="amount">$34,600</span>
+              <span class="sublabel">/ yr estimated revenue</span>
+            </div>
+          </div>
+        </div>
+        <div class="tool-body">
+          <div class="tool-type">Calculator · Interactive</div>
+          <h3>Advisory Revenue Calculator</h3>
+          <p>See what SaaS management could be worth to your practice. Adjust your client count, size, and fee model — results update in real time.</p>
+          <div class="tool-btn">Use the calculator →</div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem">
+  <div class="problem-inner">
+    <div class="section-label">The problem</div>
+    <h2 class="section-h2">Most SaaS management tools weren't built for advisors.</h2>
+    <p class="section-sub">They assume one organisation, one IT team, and enterprise-grade infrastructure. Most of your clients have none of that.</p>
+
+    <div class="problem-grid">
+      <div class="problem-item">
+        <div class="problem-num">01</div>
+        <h3>No multi-client view</h3>
+        <p>Every other tool assumes you work inside one organisation. Switching between client accounts manually isn't a workflow — it's overhead.</p>
+      </div>
+      <div class="problem-item">
+        <div class="problem-num">02</div>
+        <h3>Discovery requires infrastructure SMBs don't have</h3>
+        <p>Most discovery tools rely on SSO and identity providers. Your clients use Xero and QuickBooks. AppVentory works from what's already there.</p>
+      </div>
+      <div class="problem-item">
+        <div class="problem-num">03</div>
+        <h3>Dashboards aren't client deliverables</h3>
+        <p>Finding a problem is not the same as presenting it. Your clients need structured findings — not a login to another platform to explore.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section class="benefits">
+  <div class="benefits-inner">
+    <div class="benefits-header">
+      <div class="section-label">What AppVentory does</div>
+      <h2 class="section-h2">Three things that change how you work with clients.</h2>
+      <p class="section-sub">No implementation project. Connects to existing accounting software and works from the data that's already there.</p>
+    </div>
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <div class="benefit-marker"></div>
+        <h3>Discovery from accounting data</h3>
+        <p>Connect Xero, QuickBooks, or FreshBooks. Every subscription is identified from financial transactions — no SSO, no admin access, no IT dependency.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-marker"></div>
+        <h3>All clients in one place</h3>
+        <p>A single view across your book of business. Stack, spend, renewals, and flags — organised by client, updated automatically.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-marker"></div>
+        <h3>Findings you can present</h3>
+        <p>Reports structured for client conversations — overlaps, renewal risks, and areas worth reviewing. Formatted to go into a meeting.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="how-inner">
+    <div class="section-label">How it works</div>
+    <h2 class="section-h2">From connection to findings in one session.</h2>
+    <p class="section-sub">No implementation. No IT handoff. Connect the accounting software and the inventory builds itself.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-dot"></div>
+        <h3>Connect the accounting software</h3>
+        <p>Link Xero, QuickBooks, or FreshBooks. Read-only access. Nothing is written back to the account.</p>
+      </div>
+      <div class="step">
+        <div class="step-dot"></div>
+        <h3>Review the inventory</h3>
+        <p>Every subscription, vendor, and renewal date surfaces from the transaction data. Duplicates and anomalies are flagged automatically.</p>
+      </div>
+      <div class="step">
+        <div class="step-dot"></div>
+        <h3>Present the findings</h3>
+        <p>Export a structured report with identified issues and recommended actions — ready for a client conversation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section class="proof">
+  <div class="proof-inner">
+    <div class="section-label">Early traction</div>
+    <h2 class="section-h2">Where things stand.</h2>
+    <div class="proof-stat-row">
+      <div class="proof-stat">
+        <div class="stat-num">20+</div>
+        <div class="stat-label">Advisory firms onboarded</div>
+      </div>
+      <div class="proof-stat">
+        <div class="stat-num">$0</div>
+        <div class="stat-label">IT infrastructure required</div>
+      </div>
+      <div class="proof-stat">
+        <div class="stat-num">&lt;1hr</div>
+        <div class="stat-label">Typical time to first findings</div>
+      </div>
+    </div>
+    <div class="testimonial">
+      <div class="testimonial-text">"Add your own quote here once you have one. A single specific sentence from a real customer lands better than a polished paragraph."</div>
+      <div class="testimonial-author">
+        <div class="author-avatar">—</div>
+        <div>
+          <div class="author-name">Customer name</div>
+          <div class="author-title">Role, Firm</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="demo">
+  <div class="cta-inner">
+    <div class="section-label">Book a demo</div>
+    <h2 class="section-h2">See it working against a real account.</h2>
+    <p class="section-sub">We'll connect to a live account during the call and run discovery in front of you. 30 minutes, no slides.</p>
+    <a href="mailto:demo@appventory.com" class="btn-primary">Book a demo</a>
+    <div class="cta-friction">No setup required before the call.</div>
+    <div class="skeptic">
+      <div class="skeptic-label">If you're not ready yet</div>
+      <p>We're not going to claim a specific percentage saving. What we can do is run discovery on a real account during the call and show you what actually comes back.</p>
+      <p>If that's not useful for the clients you work with, you'll know in 30 minutes. No account needed beforehand, no contract at the end.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="footer-logo">AppVentory</a>
+  <div class="footer-copy">© 2026 AppVentory · GDPR compliant · ISO certified · SOC 2 aligned</div>
+</footer>
+
+</body>
+</html>
