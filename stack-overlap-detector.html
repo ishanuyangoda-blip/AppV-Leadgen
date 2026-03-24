@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stack Overlap Detector — AppVentory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d1520; --surface: #162032; --surface-2: #1e2f47;
+  --pink: #FF81E3; --pink-dim: rgba(255,129,227,0.10); --pink-border: rgba(255,129,227,0.22);
+  --white: #ffffff; --text: #dde4ee; --text-muted: #8fa3bc;
+  --border: rgba(255,255,255,0.075); --border-hi: rgba(255,255,255,0.13);
+  --green: #3ecf8e; --green-bg: rgba(62,207,142,0.10);
+  --amber: #f39c12; --amber-bg: rgba(243,156,18,0.12);
+  --red: #e74c3c; --red-bg: rgba(231,76,60,0.12);
+  --blue: #60a5fa; --blue-bg: rgba(96,165,250,0.10);
+  --radius: 12px;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.65; min-height: 100vh; -webkit-font-smoothing: antialiased; font-size: 16px; }
+
+nav { position: sticky; top: 0; z-index: 100; background: rgba(13,21,32,0.92); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); padding: 0 6%; display: flex; align-items: center; justify-content: space-between; height: 58px; }
+.nav-logo { font-family: 'Fraunces', serif; font-weight: 700; font-size: 18px; color: var(--white); text-decoration: none; }
+.nav-back { font-size: 13px; font-weight: 500; color: var(--text-muted); text-decoration: none; transition: color 0.15s; }
+.nav-back:hover { color: var(--white); }
+
+.tool-wrap { max-width: 800px; margin: 0 auto; padding: 64px 24px 96px; }
+.tool-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--pink); margin-bottom: 12px; }
+.tool-title { font-family: 'Fraunces', serif; font-weight: 700; font-size: clamp(28px, 5vw, 40px); color: var(--white); line-height: 1.15; margin-bottom: 14px; letter-spacing: -0.5px; }
+.tool-intro { font-size: 16px; color: var(--text-muted); margin-bottom: 40px; max-width: 560px; }
+
+.legend-row { display: flex; gap: 20px; margin-bottom: 32px; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text-muted); }
+.legend-pip { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.pip-green { background: var(--green); }
+.pip-amber { background: var(--amber); }
+.pip-red { background: var(--red); }
+.pip-grey { background: var(--border-hi); }
+
+/* Category sections */
+.category-block {
+  background: var(--surface);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--radius);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+
+.category-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; cursor: pointer; user-select: none;
+  transition: background 0.15s;
+}
+.category-header:hover { background: var(--surface-2); }
+
+.cat-left { display: flex; align-items: center; gap: 12px; }
+.cat-icon { font-size: 18px; }
+.cat-name { font-size: 15px; font-weight: 600; color: var(--white); }
+.cat-count { font-size: 12px; color: var(--text-muted); }
+.cat-chevron { color: var(--text-muted); transition: transform 0.2s; font-size: 12px; }
+.category-block.open .cat-chevron { transform: rotate(180deg); }
+
+.tools-list {
+  display: none;
+  padding: 0 20px 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+  padding: 12px 20px 16px;
+}
+
+.tool-chip {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-radius: 8px;
+  border: 1px solid var(--border-hi); background: var(--bg);
+  cursor: pointer; transition: all 0.15s; user-select: none;
+}
+.tool-chip:hover { border-color: rgba(255,129,227,0.35); }
+.tool-chip.checked { border-color: var(--pink); background: var(--pink-dim); }
+.tool-chip input { display: none; }
+.chip-check {
+  width: 16px; height: 16px; border-radius: 4px;
+  border: 1.5px solid var(--border-hi); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.tool-chip.checked .chip-check { border-color: var(--pink); background: var(--pink); }
+.tool-chip.checked .chip-check::after { content: '✓'; font-size: 10px; color: var(--bg); font-weight: 700; }
+.chip-label { font-size: 13px; color: var(--text); }
+.tool-chip.checked .chip-label { color: var(--white); }
+
+.btn-analyse {
+  background: var(--pink); color: var(--bg); font-family: 'DM Sans', sans-serif;
+  font-weight: 700; font-size: 15px; padding: 13px 28px; border-radius: 8px;
+  border: none; cursor: pointer; transition: opacity 0.15s; margin-top: 24px; margin-bottom: 40px;
+}
+.btn-analyse:hover { opacity: 0.85; }
+
+/* Results */
+#results { display: none; }
+
+.map-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.map-card {
+  background: var(--surface);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+.map-card.status-good { border-left: 3px solid var(--green); }
+.map-card.status-overlap { border-left: 3px solid var(--amber); }
+.map-card.status-waste { border-left: 3px solid var(--red); }
+.map-card.status-gap { border-left: 3px solid rgba(255,255,255,0.15); opacity: 0.6; }
+
+.map-cat-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.map-cat-icon { font-size: 16px; }
+.map-cat-name { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.map-status { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 99px; margin-left: auto; }
+.status-good .map-status { background: var(--green-bg); color: var(--green); }
+.status-overlap .map-status { background: var(--amber-bg); color: var(--amber); }
+.status-waste .map-status { background: var(--red-bg); color: var(--red); }
+.status-gap .map-status { background: var(--border); color: var(--text-muted); }
+
+.map-tools { font-size: 13px; color: var(--text); line-height: 1.6; }
+.map-tools.empty { color: var(--text-muted); font-style: italic; }
+
+.findings-block { background: var(--surface); border: 1px solid var(--border-hi); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; }
+.findings-title { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; }
+.finding-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.finding-row:last-child { border-bottom: none; padding-bottom: 0; }
+.finding-icon { font-size: 14px; flex-shrink: 0; }
+.finding-text { font-size: 14px; color: var(--text); line-height: 1.5; }
+
+.cta-card { background: var(--surface); border: 1px solid var(--pink-border); border-radius: var(--radius); padding: 32px; text-align: center; margin-top: 32px; }
+.cta-card h3 { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+.cta-card p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; max-width: 380px; margin-left: auto; margin-right: auto; }
+.email-row { display: flex; gap: 10px; max-width: 440px; margin: 0 auto 8px; }
+.email-row input { flex: 1; background: var(--bg); border: 1px solid var(--border-hi); border-radius: 8px; padding: 12px 16px; font-size: 14px; color: var(--white); font-family: 'DM Sans', sans-serif; outline: none; }
+.email-row input::placeholder { color: var(--text-muted); }
+.email-row input:focus { border-color: var(--pink); }
+.micro-text { font-size: 12px; color: var(--text-muted); }
+.retake-link { display: block; text-align: center; margin-top: 20px; color: var(--pink); font-size: 14px; text-decoration: underline; cursor: pointer; background: none; border: none; font-family: inherit; }
+
+@media (max-width: 640px) { .map-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 420px) { .map-grid { grid-template-columns: 1fr; } .email-row { flex-direction: column; } }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">AppVentory</a>
+  <a href="index.html" class="nav-back">← Back to site</a>
+</nav>
+
+<div class="tool-wrap">
+  <div id="quiz">
+    <div class="tool-label">Stack Overlap Detector · Interactive</div>
+    <h1 class="tool-title">What tools is this client actually running?</h1>
+    <p class="tool-intro">Tick everything the client uses. Get an instant visual map showing what's covered, where there's duplication, and what might be missing — no numbers, just clarity.</p>
+
+    <div class="legend-row">
+      <div class="legend-item"><div class="legend-pip pip-green"></div> One tool — good</div>
+      <div class="legend-item"><div class="legend-pip pip-amber"></div> Two tools — overlap</div>
+      <div class="legend-item"><div class="legend-pip pip-red"></div> Three+ — waste</div>
+      <div class="legend-item"><div class="legend-pip pip-grey"></div> None — potential gap</div>
+    </div>
+
+    <div id="categoriesContainer"></div>
+
+    <button class="btn-analyse" onclick="analyse()">Analyse this stack →</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+    <div style="margin-bottom:28px">
+      <div class="tool-label">Stack map</div>
+      <div style="font-family:'Fraunces',serif;font-size:clamp(22px,4vw,32px);font-weight:700;color:var(--white);letter-spacing:-0.4px;" id="resultsTitle"></div>
+    </div>
+
+    <div class="map-grid" id="mapGrid"></div>
+    <div class="findings-block" id="findingsBlock">
+      <div class="findings-title">Key observations</div>
+      <div id="findingsList"></div>
+    </div>
+
+    <div class="cta-card">
+      <h3>See the real picture — from transaction data.</h3>
+      <p>AppVentory discovers every tool the client pays for automatically — no ticking boxes, no manual input. The full stack, in one place.</p>
+      <div class="email-row">
+        <input type="email" id="emailInput" placeholder="your@email.com">
+        <button class="btn-analyse" style="margin:0;padding:12px 20px;font-size:14px" onclick="submitEmail()">Book a demo</button>
+      </div>
+      <p class="micro-text">No spam. 30-minute call, no slides.</p>
+    </div>
+    <button class="retake-link" onclick="retake()">← Start over</button>
+  </div>
+</div>
+
+<script>
+const CATEGORIES = [
+  { name: 'Communication', icon: '💬', tools: ['Slack','Microsoft Teams','Google Chat','Zoom','Discord','WhatsApp Business','Loom','Intercom'] },
+  { name: 'Project Management', icon: '📋', tools: ['Asana','Monday.com','Trello','Jira','Notion','ClickUp','Basecamp','Linear','Todoist'] },
+  { name: 'CRM & Sales', icon: '🤝', tools: ['Salesforce','HubSpot','Pipedrive','Zoho CRM','Copper','ActiveCampaign','Close','Freshsales'] },
+  { name: 'Finance & Accounting', icon: '💰', tools: ['Xero','QuickBooks','FreshBooks','MYOB','Sage','Wave','Dext','Expensify'] },
+  { name: 'File Storage & Docs', icon: '📁', tools: ['Google Drive','Dropbox','OneDrive','Box','Notion','SharePoint','Confluence'] },
+  { name: 'Design & Creative', icon: '🎨', tools: ['Figma','Canva','Adobe Creative Cloud','Sketch','InVision','Miro','Whimsical'] },
+  { name: 'HR & People', icon: '👥', tools: ['BambooHR','Gusto','Deputy','Employment Hero','Workday','Rippling','Culture Amp','Lattice'] },
+  { name: 'Analytics & Data', icon: '📊', tools: ['Google Analytics','Mixpanel','Amplitude','Tableau','Looker','Power BI','Heap','Hotjar'] },
+  { name: 'Marketing', icon: '📣', tools: ['Mailchimp','HubSpot Marketing','Klaviyo','Hootsuite','Buffer','SEMrush','Ahrefs','Webflow'] },
+  { name: 'Security & IT', icon: '🔒', tools: ['1Password','LastPass','Okta','Cloudflare','Duo','SentinelOne','Jamf','NordVPN'] },
+  { name: 'Customer Support', icon: '🎧', tools: ['Zendesk','Intercom','Freshdesk','Help Scout','Gorgias','Crisp','Tidio'] },
+  { name: 'Development & Infra', icon: '⚙️', tools: ['GitHub','GitLab','AWS','Google Cloud','Azure','Vercel','Netlify','Heroku','Datadog'] },
+];
+
+let selected = {};
+
+// Build UI
+const container = document.getElementById('categoriesContainer');
+CATEGORIES.forEach((cat, ci) => {
+  selected[cat.name] = [];
+  const block = document.createElement('div');
+  block.className = 'category-block';
+  block.innerHTML = `
+    <div class="category-header" onclick="toggleCat(this)">
+      <div class="cat-left">
+        <span class="cat-icon">${cat.icon}</span>
+        <span class="cat-name">${cat.name}</span>
+        <span class="cat-count" id="count-${ci}">0 selected</span>
+      </div>
+      <span class="cat-chevron">▼</span>
+    </div>
+    <div class="tools-list" id="tools-${ci}">
+      ${cat.tools.map(t => `
+        <label class="tool-chip" onclick="toggleTool(this,'${cat.name}','${t}',${ci})">
+          <input type="checkbox" value="${t}">
+          <span class="chip-check"></span>
+          <span class="chip-label">${t}</span>
+        </label>
+      `).join('')}
+    </div>
+  `;
+  container.appendChild(block);
+});
+
+function toggleCat(header) {
+  const block = header.parentElement;
+  const toolsList = header.nextElementSibling;
+  block.classList.toggle('open');
+  toolsList.style.display = block.classList.contains('open') ? 'grid' : 'none';
+}
+
+// Open first cat by default
+const firstBlock = container.querySelector('.category-block');
+if (firstBlock) {
+  firstBlock.classList.add('open');
+  firstBlock.querySelector('.tools-list').style.display = 'grid';
+}
+
+function toggleTool(chip, catName, toolName, catIdx) {
+  chip.classList.toggle('checked');
+  const arr = selected[catName];
+  const idx = arr.indexOf(toolName);
+  if (idx === -1) arr.push(toolName);
+  else arr.splice(idx, 1);
+  const count = arr.length;
+  document.getElementById(`count-${catIdx}`).textContent = count === 0 ? '0 selected' : `${count} selected`;
+}
+
+function analyse() {
+  const totalSelected = Object.values(selected).flat().length;
+  if (totalSelected === 0) { alert('Please select at least one tool to continue.'); return; }
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+
+  const overlaps = [];
+  const gaps = [];
+  const waste = [];
+  let goodCount = 0;
+
+  const mapGrid = document.getElementById('mapGrid');
+  mapGrid.innerHTML = '';
+
+  CATEGORIES.forEach(cat => {
+    const tools = selected[cat.name];
+    const count = tools.length;
+    let status, statusLabel;
+    if (count === 0) { status = 'gap'; statusLabel = 'Not covered'; gaps.push(cat.name); }
+    else if (count === 1) { status = 'good'; statusLabel = 'Good'; goodCount++; }
+    else if (count === 2) { status = 'overlap'; statusLabel = 'Overlap'; overlaps.push({ cat: cat.name, tools }); }
+    else { status = 'waste'; statusLabel = 'Waste'; waste.push({ cat: cat.name, tools }); }
+
+    mapGrid.innerHTML += `
+      <div class="map-card status-${status}">
+        <div class="map-cat-header">
+          <span class="map-cat-icon">${cat.icon}</span>
+          <span class="map-cat-name">${cat.name}</span>
+          <span class="map-status">${statusLabel}</span>
+        </div>
+        <div class="map-tools ${count === 0 ? 'empty' : ''}">${count === 0 ? 'Nothing selected' : tools.join(', ')}</div>
+      </div>
+    `;
+  });
+
+  // Title
+  const issues = overlaps.length + waste.length;
+  document.getElementById('resultsTitle').textContent =
+    issues === 0 ? 'A clean, well-rationalised stack.'
+    : issues <= 2 ? `${issues} area${issues === 1 ? '' : 's'} with tool overlap.`
+    : `${issues} areas with overlap or waste — worth addressing.`;
+
+  // Findings
+  const findings = [];
+  waste.forEach(w => findings.push({ icon: '🔴', text: `<strong>${w.cat}:</strong> ${w.tools.length} tools doing the same job (${w.tools.join(', ')})` }));
+  overlaps.forEach(o => findings.push({ icon: '🟡', text: `<strong>${o.cat}:</strong> Two tools in use — ${o.tools.join(' and ')} — worth consolidating` }));
+  if (gaps.length > 3) findings.push({ icon: '🔵', text: `${gaps.length} categories not covered — may be intentional, worth confirming` });
+  if (goodCount >= 6) findings.push({ icon: '✅', text: 'Most categories have a single, clear tool in place — good stack discipline' });
+  if (findings.length === 0) findings.push({ icon: '✅', text: 'No significant overlap detected. This is a well-structured stack.' });
+
+  document.getElementById('findingsList').innerHTML = findings.map(f =>
+    `<div class="finding-row"><span class="finding-icon">${f.icon}</span><span class="finding-text">${f.text}</span></div>`
+  ).join('');
+}
+
+function submitEmail() {
+  const email = document.getElementById('emailInput').value;
+  if (!email || !email.includes('@')) { document.getElementById('emailInput').style.borderColor = 'var(--red)'; return; }
+  document.querySelector('.cta-card').innerHTML = `<h3>Thanks — we'll be in touch.</h3><p style="margin-bottom:0">We'll reach out within one business day.</p>`;
+}
+
+function retake() {
+  selected = {};
+  CATEGORIES.forEach(cat => selected[cat.name] = []);
+  document.querySelectorAll('.tool-chip').forEach(c => c.classList.remove('checked'));
+  document.querySelectorAll('.cat-count').forEach(c => c.textContent = '0 selected');
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advisory Conversation Starter — AppVentory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d1520; --surface: #162032; --surface-2: #1e2f47;
+  --pink: #FF81E3; --pink-dim: rgba(255,129,227,0.10); --pink-border: rgba(255,129,227,0.22);
+  --white: #ffffff; --text: #dde4ee; --text-muted: #8fa3bc;
+  --border: rgba(255,255,255,0.075); --border-hi: rgba(255,255,255,0.13);
+  --green: #3ecf8e; --green-bg: rgba(62,207,142,0.10);
+  --amber: #f39c12; --red: #e74c3c; --radius: 12px;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.65; min-height: 100vh; -webkit-font-smoothing: antialiased; font-size: 16px; }
+
+nav { position: sticky; top: 0; z-index: 100; background: rgba(13,21,32,0.92); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); padding: 0 6%; display: flex; align-items: center; justify-content: space-between; height: 58px; }
+.nav-logo { font-family: 'Fraunces', serif; font-weight: 700; font-size: 18px; color: var(--white); text-decoration: none; }
+.nav-back { font-size: 13px; font-weight: 500; color: var(--text-muted); text-decoration: none; transition: color 0.15s; }
+.nav-back:hover { color: var(--white); }
+
+.tool-wrap { max-width: 700px; margin: 0 auto; padding: 64px 24px 96px; }
+.tool-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--pink); margin-bottom: 12px; }
+.tool-title { font-family: 'Fraunces', serif; font-weight: 700; font-size: clamp(28px, 5vw, 40px); color: var(--white); line-height: 1.15; margin-bottom: 14px; letter-spacing: -0.5px; }
+.tool-intro { font-size: 16px; color: var(--text-muted); margin-bottom: 48px; max-width: 520px; }
+
+.progress-bar-wrap { height: 3px; background: var(--border); border-radius: 99px; margin-bottom: 40px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: var(--pink); border-radius: 99px; transition: width 0.4s ease; }
+
+.step { display: none; }
+.step.active { display: block; }
+
+.q-title { font-family: 'Fraunces', serif; font-size: clamp(20px, 3vw, 26px); font-weight: 700; color: var(--white); margin-bottom: 28px; line-height: 1.25; letter-spacing: -0.3px; }
+.options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+.opt { display: flex; align-items: center; gap: 14px; background: var(--surface); border: 1px solid var(--border-hi); border-radius: var(--radius); padding: 16px 20px; cursor: pointer; transition: all 0.15s; user-select: none; }
+.opt:hover { border-color: rgba(255,129,227,0.35); background: var(--surface-2); }
+.opt.selected { border-color: var(--pink); background: var(--pink-dim); }
+.opt-radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border-hi); flex-shrink: 0; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
+.opt.selected .opt-radio { border-color: var(--pink); background: var(--pink); }
+.opt.selected .opt-radio::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--bg); }
+.opt-label { font-size: 15px; font-weight: 500; color: var(--text); }
+.opt-sub { font-size: 12px; color: var(--text-muted); display: block; margin-top: 2px; }
+.opt.selected .opt-label { color: var(--white); }
+
+.nav-btns { display: flex; gap: 12px; }
+.btn-primary { background: var(--pink); color: var(--bg); font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px; padding: 13px 28px; border-radius: 8px; border: none; cursor: pointer; transition: opacity 0.15s; }
+.btn-primary:hover { opacity: 0.85; }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-ghost { background: transparent; color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 15px; padding: 13px 20px; border-radius: 8px; border: 1px solid var(--border-hi); cursor: pointer; transition: all 0.15s; }
+.btn-ghost:hover { color: var(--white); }
+
+/* Results */
+#results { display: none; }
+
+.results-intro { margin-bottom: 32px; }
+.results-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--pink); margin-bottom: 10px; }
+.results-title { font-family: 'Fraunces', serif; font-size: clamp(22px, 3.5vw, 30px); font-weight: 700; color: var(--white); line-height: 1.25; letter-spacing: -0.4px; margin-bottom: 8px; }
+.results-subtitle { font-size: 14px; color: var(--text-muted); }
+
+.question-group { margin-bottom: 28px; }
+.group-title {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.group-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 10px;
+}
+.q-text { font-size: 15px; color: var(--white); font-weight: 500; margin-bottom: 8px; line-height: 1.5; }
+.q-listen { font-size: 13px; color: var(--text-muted); line-height: 1.55; }
+.q-listen strong { color: var(--pink); font-weight: 500; }
+
+.tip-card {
+  background: var(--pink-dim);
+  border: 1px solid var(--pink-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 28px;
+}
+.tip-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--pink); margin-bottom: 8px; }
+.tip-text { font-size: 14px; color: var(--text); line-height: 1.6; }
+
+.cta-card { background: var(--surface); border: 1px solid var(--pink-border); border-radius: var(--radius); padding: 32px; text-align: center; margin-top: 32px; }
+.cta-card h3 { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+.cta-card p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; max-width: 380px; margin-left: auto; margin-right: auto; }
+.email-row { display: flex; gap: 10px; max-width: 440px; margin: 0 auto 8px; }
+.email-row input { flex: 1; background: var(--bg); border: 1px solid var(--border-hi); border-radius: 8px; padding: 12px 16px; font-size: 14px; color: var(--white); font-family: 'DM Sans', sans-serif; outline: none; }
+.email-row input::placeholder { color: var(--text-muted); }
+.email-row input:focus { border-color: var(--pink); }
+.micro-text { font-size: 12px; color: var(--text-muted); }
+.retake-link { display: block; text-align: center; margin-top: 20px; color: var(--pink); font-size: 14px; text-decoration: underline; cursor: pointer; background: none; border: none; font-family: inherit; }
+
+@media (max-width: 600px) { .email-row { flex-direction: column; } }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">AppVentory</a>
+  <a href="index.html" class="nav-back">← Back to site</a>
+</nav>
+
+<div class="tool-wrap">
+  <div id="quiz">
+    <div class="tool-label">Conversation Starter · 4 Questions</div>
+    <h1 class="tool-title">Get the right questions before your next client meeting.</h1>
+    <p class="tool-intro">Tell us about the client and the conversation. Get a tailored set of diagnostic questions — and what to listen for when they answer.</p>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+    </div>
+
+    <!-- Q1 -->
+    <div class="step active" id="step-0">
+      <div class="q-title">What industry is this client in?</div>
+      <div class="options">
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Professional services<span class="opt-sub">Law, accounting, consulting, recruitment</span></span><input type="radio" name="q0" value="professional" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Retail or e-commerce<span class="opt-sub">Physical or online retail, wholesale</span></span><input type="radio" name="q0" value="retail" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Trade or construction<span class="opt-sub">Builders, plumbers, electricians, contractors</span></span><input type="radio" name="q0" value="trade" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Healthcare or allied health<span class="opt-sub">Clinics, practitioners, health services</span></span><input type="radio" name="q0" value="health" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Technology or SaaS<span class="opt-sub">Software, digital products, tech startups</span></span><input type="radio" name="q0" value="tech" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Other / General SMB</span><input type="radio" name="q0" value="other" hidden></label>
+      </div>
+      <div class="nav-btns"><button class="btn-primary" onclick="next(0)" id="btn-0" disabled>Next →</button></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="step" id="step-1">
+      <div class="q-title">How big is this client's team?</div>
+      <div class="options">
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">1–10 people<span class="opt-sub">Sole trader or micro-business</span></span><input type="radio" name="q1" value="micro" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">11–50 people<span class="opt-sub">Small business — likely no dedicated IT</span></span><input type="radio" name="q1" value="small" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">51–200 people<span class="opt-sub">Mid-size — may have an IT person or manager</span></span><input type="radio" name="q1" value="mid" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">200+ people<span class="opt-sub">Larger business — likely has internal IT</span></span><input type="radio" name="q1" value="large" hidden></label>
+      </div>
+      <div class="nav-btns">
+        <button class="btn-ghost" onclick="back(1)">← Back</button>
+        <button class="btn-primary" onclick="next(1)" id="btn-1" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="step" id="step-2">
+      <div class="q-title">What's your relationship with this client?</div>
+      <div class="options">
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">New prospect — first meeting<span class="opt-sub">They don't know you well yet</span></span><input type="radio" name="q2" value="prospect" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Existing client — first tech conversation<span class="opt-sub">You know them but haven't discussed their software</span></span><input type="radio" name="q2" value="first" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Existing client — ongoing advisory<span class="opt-sub">You already have a tech advisory relationship</span></span><input type="radio" name="q2" value="ongoing" hidden></label>
+      </div>
+      <div class="nav-btns">
+        <button class="btn-ghost" onclick="back(2)">← Back</button>
+        <button class="btn-primary" onclick="next(2)" id="btn-2" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="step" id="step-3">
+      <div class="q-title">What do you think the primary concern is?</div>
+      <div class="options">
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Cost — they're spending too much and don't know where<span class="opt-sub"></span></span><input type="radio" name="q3" value="cost" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Visibility — they don't know what tools they have<span class="opt-sub"></span></span><input type="radio" name="q3" value="visibility" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Efficiency — tools aren't being used or are slowing people down<span class="opt-sub"></span></span><input type="radio" name="q3" value="efficiency" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Not sure yet — this conversation will tell me</span><input type="radio" name="q3" value="unknown" hidden></label>
+      </div>
+      <div class="nav-btns">
+        <button class="btn-ghost" onclick="back(3)">← Back</button>
+        <button class="btn-primary" onclick="showResults()" id="btn-3" disabled>Generate questions →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+    <div class="results-intro">
+      <div class="results-label">Your conversation guide</div>
+      <div class="results-title" id="resultsTitle"></div>
+      <div class="results-subtitle" id="resultsSubtitle"></div>
+    </div>
+
+    <div id="tipCard"></div>
+    <div id="questionsContainer"></div>
+
+    <div class="cta-card">
+      <h3>Turn the answers into a real report.</h3>
+      <p>AppVentory connects to your client's accounting software and surfaces exactly what they're paying for — automatically. Bring real data into the next conversation.</p>
+      <div class="email-row">
+        <input type="email" id="emailInput" placeholder="your@email.com">
+        <button class="btn-primary" onclick="submitEmail()">Book a demo</button>
+      </div>
+      <p class="micro-text">No spam. 30 minutes, no slides.</p>
+    </div>
+    <button class="retake-link" onclick="retake()">← Generate for a different client</button>
+  </div>
+</div>
+
+<script>
+let answers = {};
+let currentStep = 0;
+const totalSteps = 4;
+
+document.querySelectorAll('.opt').forEach(opt => {
+  opt.addEventListener('click', () => {
+    const radio = opt.querySelector('input[type="radio"]');
+    const name = radio.name;
+    const idx = parseInt(name.replace('q', ''));
+    document.querySelectorAll(`[name="${name}"]`).forEach(r => r.closest('.opt').classList.remove('selected'));
+    opt.classList.add('selected');
+    radio.checked = true;
+    answers[name] = radio.value;
+    const btn = document.getElementById(`btn-${idx}`);
+    if (btn) btn.disabled = false;
+  });
+});
+
+function updateProgress() {
+  document.getElementById('progressFill').style.width = ((currentStep / totalSteps) * 100) + '%';
+}
+function next(idx) {
+  if (!answers[`q${idx}`]) return;
+  document.getElementById(`step-${idx}`).classList.remove('active');
+  currentStep = idx + 1;
+  document.getElementById(`step-${currentStep}`).classList.add('active');
+  updateProgress();
+}
+function back(idx) {
+  document.getElementById(`step-${idx}`).classList.remove('active');
+  currentStep = idx - 1;
+  document.getElementById(`step-${currentStep}`).classList.add('active');
+  updateProgress();
+}
+
+const INDUSTRY_CONTEXT = {
+  professional: { label: 'Professional services', note: 'These businesses often accumulate tools organically across different team members. Billing software, time tracking, and CRM are common overlap areas.' },
+  retail: { label: 'Retail', note: 'Retail businesses often have a complex stack around POS, inventory, e-commerce, and marketing. Duplication across these layers is common.' },
+  trade: { label: 'Trade / Construction', note: 'Trade businesses often use basic tools but may be missing key systems. Job management and quoting software are frequent pain points.' },
+  health: { label: 'Healthcare', note: 'Healthcare clients often have compliance requirements that affect tool choices. Practice management software is often over-licensed.' },
+  tech: { label: 'Technology', note: 'Tech companies tend to be over-tooled. Multiple dev tools, analytics platforms, and comms apps are common. Adoption is often low despite high spend.' },
+  other: { label: 'SMB', note: 'A broad base — the most common issues are invisible subscriptions, tool duplication, and renewals that pass without review.' }
+};
+
+const RELATIONSHIP_TIPS = {
+  prospect: 'Lead with curiosity, not recommendations. Your goal here is to surface a problem they recognise — not prescribe a solution before you\'ve established trust.',
+  first: 'They already trust you in another area. Frame this as an extension of the work you already do together. "As part of understanding the full picture of the business..." is a good opener.',
+  ongoing: 'You can be more direct here. You already know their situation — focus on deepening the conversation rather than discovering basics.'
+};
+
+function buildQuestions(industry, size, relationship, concern) {
+  const questions = [];
+
+  // Opening / inventory
+  questions.push({
+    group: 'Getting a baseline',
+    items: [
+      {
+        q: 'If I asked you to list every piece of software this business pays for right now, how confident are you in that list?',
+        listen: '<strong>Listen for:</strong> "Probably most of them" or "I\'m not really sure" — either answer opens the door. Most businesses can\'t name everything.'
+      },
+      {
+        q: size === 'micro' || size === 'small'
+          ? 'Who in the business knows what software is being used — and who decides when to add something new?'
+          : 'Is there a process for approving new software purchases, or does it happen ad hoc across different people?',
+        listen: '<strong>Listen for:</strong> "It\'s a bit of a free-for-all" or "usually the owner just signs up for things." This indicates unmanaged sprawl.'
+      }
+    ]
+  });
+
+  // Cost / spend
+  if (concern === 'cost' || concern === 'unknown') {
+    questions.push({
+      group: 'Understanding spend',
+      items: [
+        {
+          q: 'Do you know roughly what the business spends on software each month — as a total number?',
+          listen: '<strong>Listen for:</strong> A vague range or "I\'d have to check." Most business owners significantly underestimate this — often by 40–60%.'
+        },
+        {
+          q: industry === 'tech'
+            ? 'Are there any tools the team signed up for during a product build or project that are still running but no longer needed?'
+            : 'Are there tools you\'re paying for that the team has stopped using — but the subscription is still active?',
+          listen: '<strong>Listen for:</strong> "Probably" or a specific tool that comes to mind quickly. This is usually the first easy win.'
+        }
+      ]
+    });
+  }
+
+  // Renewals
+  if (concern === 'cost' || concern === 'visibility' || concern === 'unknown') {
+    questions.push({
+      group: 'Renewal visibility',
+      items: [
+        {
+          q: 'When a software contract comes up for renewal, does someone review it — or does it usually just auto-renew?',
+          listen: '<strong>Listen for:</strong> "It just happens" or "I usually find out when I see the invoice." This is the most common source of wasted SaaS spend.'
+        },
+        {
+          q: size === 'large'
+            ? 'How many software renewals came through in the last 12 months that weren\'t reviewed before they renewed?'
+            : 'Has an annual subscription ever renewed before you realised — and you\'d have cancelled it if you\'d been asked?',
+          listen: '<strong>Listen for:</strong> Any "yes" here is a direct dollar figure attached to a real problem.'
+        }
+      ]
+    });
+  }
+
+  // Efficiency / adoption
+  if (concern === 'efficiency' || concern === 'unknown') {
+    questions.push({
+      group: 'Adoption and usage',
+      items: [
+        {
+          q: 'Are there tools the team was onboarded onto but has since stopped using — either going back to spreadsheets or using a different tool instead?',
+          listen: '<strong>Listen for:</strong> Tool names mentioned casually. "We got Asana but nobody really uses it anymore" is a common answer. Each one is a wasted license.'
+        },
+        {
+          q: 'When someone leaves the business, is there a checklist for removing their access to tools they were using?',
+          listen: '<strong>Listen for:</strong> "Not formally" or "we usually catch most of them." Former staff with active accounts is both a security issue and a cost issue.'
+        }
+      ]
+    });
+  }
+
+  // Closing / appetite
+  questions.push({
+    group: relationship === 'prospect' ? 'Gauging appetite' : 'Next steps',
+    items: [
+      {
+        q: relationship === 'prospect'
+          ? 'If you knew exactly what software the business was paying for and how much was being wasted, what would you do with that information?'
+          : 'If we ran a full audit of the software stack and came back with a clear list of what to cut, consolidate, and keep — is that a conversation worth having?',
+        listen: '<strong>Listen for:</strong> Engagement and specificity. "We\'d cut things immediately" signals high readiness. "It\'d be interesting to see" signals interest but lower urgency — worth following up with a quick win.'
+      }
+    ]
+  });
+
+  return questions;
+}
+
+function showResults() {
+  if (!answers.q3) return;
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+
+  const { q0: industry, q1: size, q2: relationship, q3: concern } = answers;
+  const ctx = INDUSTRY_CONTEXT[industry];
+
+  const sizeLabels = { micro: '1–10 person', small: '11–50 person', mid: '51–200 person', large: '200+ person' };
+  const relLabels = { prospect: 'prospect', first: 'existing client (first tech conversation)', ongoing: 'ongoing advisory client' };
+
+  document.getElementById('resultsTitle').textContent = `Questions for your ${sizeLabels[size]} ${ctx.label} ${relLabels[relationship]}.`;
+  document.getElementById('resultsSubtitle').textContent = `${ctx.note}`;
+
+  document.getElementById('tipCard').innerHTML = `
+    <div class="tip-card">
+      <div class="tip-label">Approach for this conversation</div>
+      <div class="tip-text">${RELATIONSHIP_TIPS[relationship]}</div>
+    </div>
+  `;
+
+  const qGroups = buildQuestions(industry, size, relationship, concern);
+  document.getElementById('questionsContainer').innerHTML = qGroups.map(group => `
+    <div class="question-group">
+      <div class="group-title">${group.group}</div>
+      ${group.items.map(item => `
+        <div class="q-card">
+          <div class="q-text">"${item.q}"</div>
+          <div class="q-listen">${item.listen}</div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+function submitEmail() {
+  const email = document.getElementById('emailInput').value;
+  if (!email || !email.includes('@')) { document.getElementById('emailInput').style.borderColor = 'var(--red)'; return; }
+  document.querySelector('.cta-card').innerHTML = `<h3>Thanks — we'll be in touch.</h3><p style="margin-bottom:0">We'll reach out within one business day.</p>`;
+}
+
+function retake() {
+  answers = {}; currentStep = 0;
+  document.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+  document.querySelectorAll('.btn-primary[id^="btn-"]').forEach(b => b.disabled = true);
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  document.getElementById('step-0').classList.add('active');
+  for (let i = 1; i < totalSteps; i++) {
+    const s = document.getElementById(`step-${i}`);
+    if (s) s.classList.remove('active');
+  }
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>

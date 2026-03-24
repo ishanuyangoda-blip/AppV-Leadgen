@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SaaS Stack Health Score — AppVentory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:          #0d1520;
+  --surface:     #162032;
+  --surface-2:   #1e2f47;
+  --pink:        #FF81E3;
+  --pink-dim:    rgba(255,129,227,0.10);
+  --pink-border: rgba(255,129,227,0.22);
+  --white:       #ffffff;
+  --text:        #dde4ee;
+  --text-muted:  #8fa3bc;
+  --border:      rgba(255,255,255,0.075);
+  --border-hi:   rgba(255,255,255,0.13);
+  --red:         #e74c3c;
+  --red-bg:      rgba(231,76,60,0.12);
+  --amber:       #f39c12;
+  --amber-bg:    rgba(243,156,18,0.12);
+  --green:       #3ecf8e;
+  --green-bg:    rgba(62,207,142,0.10);
+  --radius:      12px;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  font-size: 16px;
+}
+
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(13,21,32,0.92);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 6%;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 58px;
+}
+.nav-logo { font-family: 'Fraunces', serif; font-weight: 700; font-size: 18px; color: var(--white); text-decoration: none; }
+.nav-back { font-size: 13px; font-weight: 500; color: var(--text-muted); text-decoration: none; transition: color 0.15s; }
+.nav-back:hover { color: var(--white); }
+
+.tool-wrap {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 64px 24px 96px;
+}
+
+.tool-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pink);
+  margin-bottom: 12px;
+}
+
+.tool-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: clamp(28px, 5vw, 40px);
+  color: var(--white);
+  line-height: 1.15;
+  margin-bottom: 14px;
+  letter-spacing: -0.5px;
+}
+
+.tool-intro {
+  font-size: 16px;
+  color: var(--text-muted);
+  margin-bottom: 48px;
+  max-width: 520px;
+}
+
+/* Progress */
+.progress-bar-wrap {
+  height: 3px;
+  background: var(--border);
+  border-radius: 99px;
+  margin-bottom: 40px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: var(--pink);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+/* Steps */
+.step { display: none; }
+.step.active { display: block; }
+
+.dimension-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border-hi);
+  border-radius: 99px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  letter-spacing: 0.02em;
+}
+.dimension-badge .dot {
+  width: 7px; height: 7px; border-radius: 50%;
+}
+.dot-overlap { background: #FF81E3; }
+.dot-security { background: #e74c3c; }
+.dot-renewal { background: #f39c12; }
+.dot-adoption { background: #3ecf8e; }
+
+.q-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(20px, 3vw, 26px);
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 28px;
+  line-height: 1.25;
+  letter-spacing: -0.3px;
+}
+
+.options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+
+.opt {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+.opt:hover { border-color: rgba(255,129,227,0.35); background: var(--surface-2); }
+.opt.selected { border-color: var(--pink); background: var(--pink-dim); }
+
+.opt-radio {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--border-hi);
+  flex-shrink: 0;
+  transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.opt.selected .opt-radio {
+  border-color: var(--pink);
+  background: var(--pink);
+}
+.opt.selected .opt-radio::after {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--bg);
+}
+
+.opt-label { font-size: 15px; font-weight: 500; color: var(--text); }
+.opt.selected .opt-label { color: var(--white); }
+
+.nav-btns { display: flex; gap: 12px; }
+
+.btn-primary {
+  background: var(--pink);
+  color: var(--bg);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 13px 28px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-primary:hover { opacity: 0.85; }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  font-size: 15px;
+  padding: 13px 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border-hi);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-ghost:hover { color: var(--white); border-color: var(--border-hi); }
+
+/* Results */
+#results { display: none; }
+
+.grade-hero {
+  text-align: center;
+  padding: 48px 0 40px;
+}
+
+.grade-circle {
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  border: 3px solid;
+  display: inline-flex; align-items: center; justify-content: center;
+  margin-bottom: 20px;
+}
+.grade-letter {
+  font-family: 'Fraunces', serif;
+  font-size: 52px;
+  font-weight: 900;
+  line-height: 1;
+}
+.grade-A .grade-circle { border-color: var(--green); }
+.grade-A .grade-letter { color: var(--green); }
+.grade-B .grade-circle { border-color: #3ecf8e; }
+.grade-B .grade-letter { color: #3ecf8e; }
+.grade-C .grade-circle { border-color: var(--amber); }
+.grade-C .grade-letter { color: var(--amber); }
+.grade-D .grade-circle { border-color: var(--red); }
+.grade-D .grade-letter { color: var(--red); }
+
+.grade-summary {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+.grade-desc { font-size: 15px; color: var(--text-muted); max-width: 420px; margin: 0 auto; }
+
+.dimensions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 32px 0;
+}
+
+.dim-card {
+  background: var(--surface);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.dim-card.dim-A { border-left: 3px solid var(--green); }
+.dim-card.dim-B { border-left: 3px solid var(--green); }
+.dim-card.dim-C { border-left: 3px solid var(--amber); }
+.dim-card.dim-D { border-left: 3px solid var(--red); }
+
+.dim-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.dim-name { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.dim-grade {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 700;
+}
+.dim-A .dim-grade, .dim-B .dim-grade { color: var(--green); }
+.dim-C .dim-grade { color: var(--amber); }
+.dim-D .dim-grade { color: var(--red); }
+
+.dim-insight { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+.findings-block {
+  background: var(--surface);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.findings-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 16px;
+}
+.finding-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.finding-row:last-child { border-bottom: none; padding-bottom: 0; }
+.finding-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+.finding-text { font-size: 14px; color: var(--text); line-height: 1.5; }
+
+.cta-card {
+  background: var(--surface);
+  border: 1px solid var(--pink-border);
+  border-radius: var(--radius);
+  padding: 32px;
+  text-align: center;
+  margin-top: 32px;
+}
+.cta-card h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+.cta-card p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; max-width: 380px; margin-left: auto; margin-right: auto; }
+.cta-card p + p { margin-top: -16px; }
+
+.email-row { display: flex; gap: 10px; max-width: 440px; margin: 0 auto 8px; }
+.email-row input {
+  flex: 1; background: var(--bg); border: 1px solid var(--border-hi);
+  border-radius: 8px; padding: 12px 16px; font-size: 14px;
+  color: var(--white); font-family: 'DM Sans', sans-serif; outline: none;
+}
+.email-row input::placeholder { color: var(--text-muted); }
+.email-row input:focus { border-color: var(--pink); }
+.micro-text { font-size: 12px; color: var(--text-muted); }
+
+.retake-link {
+  display: block; text-align: center; margin-top: 20px;
+  color: var(--pink); font-size: 14px; text-decoration: underline;
+  cursor: pointer; background: none; border: none; font-family: inherit;
+}
+
+@media (max-width: 600px) {
+  .dimensions-grid { grid-template-columns: 1fr; }
+  .email-row { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">AppVentory</a>
+  <a href="index.html" class="nav-back">← Back to site</a>
+</nav>
+
+<div class="tool-wrap">
+  <div id="quiz">
+    <div class="tool-label">Health Score · 7 Questions</div>
+    <h1 class="tool-title">How healthy is this SaaS stack?</h1>
+    <p class="tool-intro">Score a client's stack across four dimensions — overlap, security, renewals, and adoption. Get a grade and specific findings in 2 minutes.</p>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+    </div>
+
+    <!-- Q1 -->
+    <div class="step active" id="step-0">
+      <div class="dimension-badge"><span class="dot dot-overlap"></span> Tool Overlap</div>
+      <div class="q-title">How many tools does this client use for similar tasks (e.g. two project management tools, two chat apps)?</div>
+      <div class="options">
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">None — each tool has a clear, unique role</span><input type="radio" name="q0" value="3" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">One or two overlaps — minor redundancy</span><input type="radio" name="q0" value="2" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Several overlaps — multiple categories have duplicates</span><input type="radio" name="q0" value="1" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Significant overlap — nobody really knows what's used</span><input type="radio" name="q0" value="0" hidden></label>
+      </div>
+      <div class="nav-btns">
+        <button class="btn-primary" onclick="next(0)" id="btn-0" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="step" id="step-1">
+      <div class="dimension-badge"><span class="dot dot-overlap"></span> Tool Overlap</div>
+      <div class="q-title">Are there tools being paid for that no one actively uses?</div>
+      <div class="options">
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">No — all tools are regularly used</span><input type="radio" name="q1" value="3" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Maybe 1–2 tools that rarely get used</span><input type="radio" name="q1" value="2" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Yes — several tools that staff have abandoned</span><input type="radio" name="q1" value="1" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Unknown — nobody tracks this</span><input type="radio" name="q1" value="0" hidden></label>
+      </div>
+      <div class="nav-btns">
+        <button class="btn-ghost" onclick="back(1)">← Back</button>
+        <button class="btn-primary" onclick="next(1)" id="btn-1" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="step" id="step-2">
+      <div class="dimension-badge"><span class="dot dot-security"></span> Security Risk</div>
+      <div class="q-title">Are login credentials shared between team members for any tools?</div>
+      <div class="options">
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">No — individual accounts for everything</span><input type="radio" name="q2" value="3" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Only for 1–2 legacy tools</span><input type="radio" name="q2" value="2" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Yes — several shared logins across the team</span><input type="radio" name="q2" value="1" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Very common — shared passwords are the norm here</span><input type="radio" name="q2" value="0" hidden></label>
+      </div>
+      <div class="nav-btns">
+        <button class="btn-ghost" onclick="back(2)">← Back</button>
+        <button class="btn-primary" onclick="next(2)" id="btn-2" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="step" id="step-3">
+      <div class="dimension-badge"><span class="dot dot-security"></span> Security Risk</div>
+      <div class="q-title">When a team member leaves, how quickly are their software access rights removed?</div>
+      <div class="options">
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Same day — there's a clear offboarding process</span><input type="radio" name="q3" value="3" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Within a week or so</span><input type="radio" name="q3" value="2" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">It varies — some get done, some are forgotten</span><input type="radio" name="q3" value="1" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">No formal process — it probably doesn't happen consistently</span><input type="radio" name="q3" value="0" hidden></label>
+      </div>
+      <div class="nav-btns">
+        <button class="btn-ghost" onclick="back(3)">← Back</button>
+        <button class="btn-primary" onclick="next(3)" id="btn-3" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="step" id="step-4">
+      <div class="dimension-badge"><span class="dot dot-renewal"></span> Renewal Exposure</div>
+      <div class="q-title">How does this client handle software renewals?</div>
+      <div class="options">
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Tracked — renewals are on a calendar with review ahead of time</span><input type="radio" name="q4" value="3" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Mostly aware — some tracked, some aren't</span><input type="radio" name="q4" value="2" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Reactive — usually find out when the invoice arrives</span><input type="radio" name="q4" value="1" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">No visibility — renewals happen and nobody notices</span><input type="radio" name="q4" value="0" hidden></label>
+      </div>
+      <div class="nav-btns">
+        <button class="btn-ghost" onclick="back(4)">← Back</button>
+        <button class="btn-primary" onclick="next(4)" id="btn-4" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="step" id="step-5">
+      <div class="dimension-badge"><span class="dot dot-adoption"></span> Adoption</div>
+      <div class="q-title">What percentage of the team actively uses the tools they're licensed for?</div>
+      <div class="options">
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Most people — 80%+ of licenses are actively used</span><input type="radio" name="q5" value="3" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">About half — 50–79% active usage</span><input type="radio" name="q5" value="2" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">A minority — fewer than half use most tools regularly</span><input type="radio" name="q5" value="1" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Unknown — there's no way to check</span><input type="radio" name="q5" value="0" hidden></label>
+      </div>
+      <div class="nav-btns">
+        <button class="btn-ghost" onclick="back(5)">← Back</button>
+        <button class="btn-primary" onclick="next(5)" id="btn-5" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="step" id="step-6">
+      <div class="dimension-badge"><span class="dot dot-adoption"></span> Adoption</div>
+      <div class="q-title">Has the client ever reviewed their full software list and made cuts?</div>
+      <div class="options">
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Yes — they do a tech review regularly</span><input type="radio" name="q6" value="3" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Once or twice — but not on a schedule</span><input type="radio" name="q6" value="2" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">No — but they'd be open to it</span><input type="radio" name="q6" value="1" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">No — and there's no appetite for it right now</span><input type="radio" name="q6" value="0" hidden></label>
+      </div>
+      <div class="nav-btns">
+        <button class="btn-ghost" onclick="back(6)">← Back</button>
+        <button class="btn-primary" onclick="showResults()" id="btn-6" disabled>See health score →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+    <div class="grade-hero" id="gradeHero">
+      <div class="grade-circle"><span class="grade-letter" id="gradeLetter"></span></div>
+      <div class="grade-summary" id="gradeSummary"></div>
+      <p class="grade-desc" id="gradeDesc"></p>
+    </div>
+
+    <div class="dimensions-grid" id="dimensionsGrid"></div>
+
+    <div class="findings-block" id="findingsBlock">
+      <div class="findings-title">Key findings</div>
+      <div id="findingsList"></div>
+    </div>
+
+    <div class="cta-card">
+      <h3>See these findings against real data.</h3>
+      <p>AppVentory connects to your client's accounting software and surfaces every subscription — automatically. No manual input required.</p>
+      <div class="email-row">
+        <input type="email" id="emailInput" placeholder="your@email.com">
+        <button class="btn-primary" onclick="submitEmail()">Book a demo</button>
+      </div>
+      <p class="micro-text">No spam. We'll reach out to book a 30-minute call.</p>
+    </div>
+
+    <button class="retake-link" onclick="retake()">← Retake for a different client</button>
+  </div>
+</div>
+
+<script>
+const totalSteps = 7;
+let answers = {};
+let currentStep = 0;
+
+// Handle option selection
+document.querySelectorAll('.opt').forEach(opt => {
+  opt.addEventListener('click', () => {
+    const radio = opt.querySelector('input[type="radio"]');
+    const name = radio.name;
+    const stepIdx = parseInt(name.replace('q', ''));
+    document.querySelectorAll(`[name="${name}"]`).forEach(r => r.closest('.opt').classList.remove('selected'));
+    opt.classList.add('selected');
+    radio.checked = true;
+    answers[`q${stepIdx}`] = parseInt(radio.value);
+    document.getElementById(`btn-${stepIdx}`).disabled = false;
+  });
+});
+
+function updateProgress() {
+  const pct = (currentStep / totalSteps) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function next(stepIdx) {
+  if (answers[`q${stepIdx}`] === undefined) return;
+  document.getElementById(`step-${stepIdx}`).classList.remove('active');
+  currentStep = stepIdx + 1;
+  if (currentStep < totalSteps) {
+    document.getElementById(`step-${currentStep}`).classList.add('active');
+    updateProgress();
+  }
+}
+
+function back(stepIdx) {
+  document.getElementById(`step-${stepIdx}`).classList.remove('active');
+  currentStep = stepIdx - 1;
+  document.getElementById(`step-${currentStep}`).classList.add('active');
+  updateProgress();
+}
+
+function getDimScore(keys) {
+  let total = 0;
+  keys.forEach(k => { total += (answers[k] || 0); });
+  const max = keys.length * 3;
+  return Math.round((total / max) * 100);
+}
+
+function scoreToGrade(score) {
+  if (score >= 80) return 'A';
+  if (score >= 60) return 'B';
+  if (score >= 40) return 'C';
+  return 'D';
+}
+
+function showResults() {
+  if (answers['q6'] === undefined) return;
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+
+  const overlapScore = getDimScore(['q0', 'q1']);
+  const secScore = getDimScore(['q2', 'q3']);
+  const renewalScore = getDimScore(['q4']);
+  const adoptionScore = getDimScore(['q5', 'q6']);
+  const overall = Math.round((overlapScore + secScore + renewalScore + adoptionScore) / 4);
+  const grade = scoreToGrade(overall);
+
+  // Grade hero
+  const hero = document.getElementById('gradeHero');
+  hero.className = `grade-hero grade-${grade}`;
+  document.getElementById('gradeLetter').textContent = grade;
+
+  const summaries = {
+    A: ['Stack in good shape', 'This client has a well-managed stack. Minor opportunities may exist but the fundamentals are solid.'],
+    B: ['Some room to improve', 'A decent stack with a few areas worth addressing. Focused action here will deliver clear returns.'],
+    C: ['Notable gaps identified', 'Several risk areas have surfaced. This client would benefit from a structured review and some targeted fixes.'],
+    D: ['Significant issues found', 'This stack has real problems across multiple areas. There\'s meaningful value in sorting this out — and it won\'t happen on its own.']
+  };
+  document.getElementById('gradeSummary').textContent = summaries[grade][0];
+  document.getElementById('gradeDesc').textContent = summaries[grade][1];
+
+  // Dimensions
+  const dims = [
+    { name: 'Overlap', score: overlapScore },
+    { name: 'Security', score: secScore },
+    { name: 'Renewals', score: renewalScore },
+    { name: 'Adoption', score: adoptionScore },
+  ];
+  const insights = {
+    Overlap: { A: 'Tools are well-rationalised with minimal redundancy.', B: 'Minor overlaps present — worth a review.', C: 'Some duplicate tools being paid for.', D: 'Significant tool duplication. Money is being wasted.' },
+    Security: { A: 'Good access hygiene — offboarding and credentials are managed.', B: 'Mostly secure with a couple of gaps to close.', C: 'Shared credentials or slow offboarding creates real risk.', D: 'Serious access control issues. Former staff may still have access.' },
+    Renewals: { A: 'Renewals are tracked and reviewed proactively.', B: 'Most renewals are managed — a few slip through.', C: 'Renewals are largely reactive. Money is auto-renewed without review.', D: 'No renewal visibility. Spend is out of control.' },
+    Adoption: { A: 'Licenses are well-used and the stack is regularly reviewed.', B: 'Good adoption overall with some unused licenses.', C: 'Many licenses go unused — wasted spend.', D: 'Low adoption across the board. Major rationalisation opportunity.' },
+  };
+  const grid = document.getElementById('dimensionsGrid');
+  grid.innerHTML = dims.map(d => {
+    const g = scoreToGrade(d.score);
+    return `<div class="dim-card dim-${g}">
+      <div class="dim-top">
+        <span class="dim-name">${d.name}</span>
+        <span class="dim-grade">${g}</span>
+      </div>
+      <div class="dim-insight">${insights[d.name][g]}</div>
+    </div>`;
+  }).join('');
+
+  // Findings
+  const findings = [];
+  if (answers.q0 <= 1) findings.push({ icon: '🔴', text: 'Tool duplication detected — multiple tools serving the same function' });
+  if (answers.q1 <= 1) findings.push({ icon: '🔴', text: 'Abandoned software still being paid for' });
+  if (answers.q2 <= 1) findings.push({ icon: '🔴', text: 'Shared credentials in use — security and audit risk' });
+  if (answers.q3 <= 1) findings.push({ icon: '🔴', text: 'Offboarding gaps — former staff may retain software access' });
+  if (answers.q4 <= 1) findings.push({ icon: '🟡', text: 'Renewals are reactive — spend is auto-approved without review' });
+  if (answers.q5 <= 1) findings.push({ icon: '🟡', text: 'Low license utilisation — licenses paid for but not used' });
+  if (answers.q6 <= 1) findings.push({ icon: '🔵', text: 'No tech review cadence — stack hasn\'t been audited' });
+  if (findings.length === 0) findings.push({ icon: '✅', text: 'No major issues found — this is a well-managed stack' });
+
+  document.getElementById('findingsList').innerHTML = findings.map(f =>
+    `<div class="finding-row"><span class="finding-icon">${f.icon}</span><span class="finding-text">${f.text}</span></div>`
+  ).join('');
+}
+
+function submitEmail() {
+  const email = document.getElementById('emailInput').value;
+  if (!email || !email.includes('@')) {
+    document.getElementById('emailInput').style.borderColor = 'var(--red)';
+    return;
+  }
+  document.querySelector('.cta-card').innerHTML = `
+    <h3>Thanks — we'll be in touch.</h3>
+    <p style="margin-bottom:0">We'll reach out within one business day to book your 30-minute demo.</p>
+  `;
+}
+
+function retake() {
+  answers = {};
+  currentStep = 0;
+  document.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+  document.querySelectorAll('.btn-primary[id^="btn-"]').forEach(b => b.disabled = true);
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  document.getElementById('step-0').classList.add('active');
+  for (let i = 1; i < totalSteps; i++) document.getElementById(`step-${i}`).classList.remove('active');
+  updateProgress();
+}
+</script>
+</body>
+</html>

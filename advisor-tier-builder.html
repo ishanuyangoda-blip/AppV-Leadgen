@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advisor Service Tier Builder — AppVentory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d1520; --surface: #162032; --surface-2: #1e2f47;
+  --pink: #FF81E3; --pink-dim: rgba(255,129,227,0.10); --pink-border: rgba(255,129,227,0.22);
+  --white: #ffffff; --text: #dde4ee; --text-muted: #8fa3bc;
+  --border: rgba(255,255,255,0.075); --border-hi: rgba(255,255,255,0.13);
+  --green: #3ecf8e; --green-bg: rgba(62,207,142,0.10);
+  --amber: #f39c12; --red: #e74c3c; --radius: 12px;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.65; min-height: 100vh; -webkit-font-smoothing: antialiased; font-size: 16px; }
+
+nav { position: sticky; top: 0; z-index: 100; background: rgba(13,21,32,0.92); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-bottom: 1px solid var(--border); padding: 0 6%; display: flex; align-items: center; justify-content: space-between; height: 58px; }
+.nav-logo { font-family: 'Fraunces', serif; font-weight: 700; font-size: 18px; color: var(--white); text-decoration: none; }
+.nav-back { font-size: 13px; font-weight: 500; color: var(--text-muted); text-decoration: none; transition: color 0.15s; }
+.nav-back:hover { color: var(--white); }
+
+.tool-wrap { max-width: 700px; margin: 0 auto; padding: 64px 24px 96px; }
+.tool-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--pink); margin-bottom: 12px; }
+.tool-title { font-family: 'Fraunces', serif; font-weight: 700; font-size: clamp(28px, 5vw, 40px); color: var(--white); line-height: 1.15; margin-bottom: 14px; letter-spacing: -0.5px; }
+.tool-intro { font-size: 16px; color: var(--text-muted); margin-bottom: 48px; max-width: 520px; }
+
+.progress-bar-wrap { height: 3px; background: var(--border); border-radius: 99px; margin-bottom: 40px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: var(--pink); border-radius: 99px; transition: width 0.4s ease; }
+
+.step { display: none; }
+.step.active { display: block; }
+
+.q-title { font-family: 'Fraunces', serif; font-size: clamp(20px, 3vw, 26px); font-weight: 700; color: var(--white); margin-bottom: 28px; line-height: 1.25; letter-spacing: -0.3px; }
+.options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+.opt { display: flex; align-items: center; gap: 14px; background: var(--surface); border: 1px solid var(--border-hi); border-radius: var(--radius); padding: 16px 20px; cursor: pointer; transition: all 0.15s; user-select: none; }
+.opt:hover { border-color: rgba(255,129,227,0.35); background: var(--surface-2); }
+.opt.selected { border-color: var(--pink); background: var(--pink-dim); }
+.opt-radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border-hi); flex-shrink: 0; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
+.opt.selected .opt-radio { border-color: var(--pink); background: var(--pink); }
+.opt.selected .opt-radio::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--bg); }
+.opt-label { font-size: 15px; font-weight: 500; color: var(--text); }
+.opt.selected .opt-label { color: var(--white); }
+
+.nav-btns { display: flex; gap: 12px; }
+.btn-primary { background: var(--pink); color: var(--bg); font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px; padding: 13px 28px; border-radius: 8px; border: none; cursor: pointer; transition: opacity 0.15s; }
+.btn-primary:hover { opacity: 0.85; }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-ghost { background: transparent; color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 15px; padding: 13px 20px; border-radius: 8px; border: 1px solid var(--border-hi); cursor: pointer; transition: all 0.15s; }
+.btn-ghost:hover { color: var(--white); }
+
+/* Results */
+#results { display: none; }
+.results-header { margin-bottom: 32px; }
+.results-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--pink); margin-bottom: 10px; }
+.results-title { font-family: 'Fraunces', serif; font-size: clamp(24px, 4vw, 34px); font-weight: 700; color: var(--white); line-height: 1.2; letter-spacing: -0.4px; }
+
+.tiers-grid { display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px; }
+
+.tier-card { background: var(--surface); border: 1px solid var(--border-hi); border-radius: var(--radius); padding: 28px; position: relative; overflow: hidden; }
+.tier-card.tier-featured { border-color: var(--pink-border); }
+.tier-card.tier-featured::before { content: 'Recommended'; position: absolute; top: 16px; right: 16px; background: var(--pink-dim); border: 1px solid var(--pink-border); color: var(--pink); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; border-radius: 99px; }
+
+.tier-top { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; }
+.tier-name { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; color: var(--white); }
+.tier-cadence { font-size: 13px; color: var(--text-muted); }
+.tier-positioning { font-size: 14px; color: var(--pink); font-weight: 500; margin-bottom: 16px; }
+.tier-deliverables { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.tier-deliverables li { font-size: 14px; color: var(--text); display: flex; align-items: flex-start; gap: 8px; }
+.tier-deliverables li::before { content: '→'; color: var(--text-muted); flex-shrink: 0; }
+
+.context-card { background: var(--surface); border: 1px solid var(--border-hi); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; }
+.context-title { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+.context-text { font-size: 14px; color: var(--text); line-height: 1.6; }
+
+.cta-card { background: var(--surface); border: 1px solid var(--pink-border); border-radius: var(--radius); padding: 32px; text-align: center; margin-top: 32px; }
+.cta-card h3 { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+.cta-card p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; max-width: 380px; margin-left: auto; margin-right: auto; }
+.email-row { display: flex; gap: 10px; max-width: 440px; margin: 0 auto 8px; }
+.email-row input { flex: 1; background: var(--bg); border: 1px solid var(--border-hi); border-radius: 8px; padding: 12px 16px; font-size: 14px; color: var(--white); font-family: 'DM Sans', sans-serif; outline: none; }
+.email-row input::placeholder { color: var(--text-muted); }
+.email-row input:focus { border-color: var(--pink); }
+.micro-text { font-size: 12px; color: var(--text-muted); }
+.retake-link { display: block; text-align: center; margin-top: 20px; color: var(--pink); font-size: 14px; text-decoration: underline; cursor: pointer; background: none; border: none; font-family: inherit; }
+
+@media (max-width: 600px) {
+  .email-row { flex-direction: column; }
+  .tier-card.tier-featured::before { position: static; display: inline-block; margin-bottom: 12px; }
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">AppVentory</a>
+  <a href="index.html" class="nav-back">← Back to site</a>
+</nav>
+
+<div class="tool-wrap">
+  <div id="quiz">
+    <div class="tool-label">Service Tier Builder · 5 Questions</div>
+    <h1 class="tool-title">What should your SaaS advisory service look like?</h1>
+    <p class="tool-intro">Answer 5 questions about your practice. Get a customised 3-tier service model you can implement immediately.</p>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+    </div>
+
+    <!-- Q1 -->
+    <div class="step active" id="step-0">
+      <div class="q-title">What best describes your advisory practice?</div>
+      <div class="options">
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Accountant or bookkeeper</span><input type="radio" name="q0" value="accountant" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Tech advisor or IT consultant</span><input type="radio" name="q0" value="tech" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Managed service provider (MSP)</span><input type="radio" name="q0" value="msp" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Business or operations consultant</span><input type="radio" name="q0" value="consultant" hidden></label>
+      </div>
+      <div class="nav-btns"><button class="btn-primary" onclick="next(0)" id="btn-0" disabled>Next →</button></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="step" id="step-1">
+      <div class="q-title">How many active clients do you manage?</div>
+      <div class="options">
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Fewer than 10</span><input type="radio" name="q1" value="small" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">10–30 clients</span><input type="radio" name="q1" value="mid" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">30–60 clients</span><input type="radio" name="q1" value="large" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">60+ clients</span><input type="radio" name="q1" value="xlarge" hidden></label>
+      </div>
+      <div class="nav-btns">
+        <button class="btn-ghost" onclick="back(1)">← Back</button>
+        <button class="btn-primary" onclick="next(1)" id="btn-1" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="step" id="step-2">
+      <div class="q-title">Do you currently offer any tech or software advisory services?</div>
+      <div class="options">
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Yes — it's a formal part of my offering</span><input type="radio" name="q2" value="yes" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Informally — clients ask and I help, but it's not structured</span><input type="radio" name="q2" value="informal" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Not yet — this would be new</span><input type="radio" name="q2" value="no" hidden></label>
+      </div>
+      <div class="nav-btns">
+        <button class="btn-ghost" onclick="back(2)">← Back</button>
+        <button class="btn-primary" onclick="next(2)" id="btn-2" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="step" id="step-3">
+      <div class="q-title">How much time can you realistically allocate per client per month for advisory work?</div>
+      <div class="options">
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Under 30 minutes — I need to be very efficient</span><input type="radio" name="q3" value="low" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">30–60 minutes per client</span><input type="radio" name="q3" value="mid" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">1–2 hours per client</span><input type="radio" name="q3" value="high" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">More than 2 hours — advisory is a major focus</span><input type="radio" name="q3" value="vhigh" hidden></label>
+      </div>
+      <div class="nav-btns">
+        <button class="btn-ghost" onclick="back(3)">← Back</button>
+        <button class="btn-primary" onclick="next(3)" id="btn-3" disabled>Next →</button>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="step" id="step-4">
+      <div class="q-title">What's your primary goal in adding SaaS advisory?</div>
+      <div class="options">
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Add a new revenue stream</span><input type="radio" name="q4" value="revenue" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Deepen client relationships and reduce churn</span><input type="radio" name="q4" value="retention" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">Differentiate from other advisors</span><input type="radio" name="q4" value="differentiation" hidden></label>
+        <label class="opt"><span class="opt-radio"></span><span class="opt-label">All of the above</span><input type="radio" name="q4" value="all" hidden></label>
+      </div>
+      <div class="nav-btns">
+        <button class="btn-ghost" onclick="back(4)">← Back</button>
+        <button class="btn-primary" onclick="showResults()" id="btn-4" disabled>Build my service tiers →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+    <div class="results-header">
+      <div class="results-label">Your advisory service model</div>
+      <div class="results-title" id="resultsTitle"></div>
+    </div>
+
+    <div class="tiers-grid" id="tiersGrid"></div>
+    <div class="context-card" id="contextCard"></div>
+
+    <div class="cta-card">
+      <h3>See this working with real client data.</h3>
+      <p>AppVentory gives you the data layer behind each of these tiers — stack visibility, renewal tracking, and client-ready reports. All from their existing accounting software.</p>
+      <div class="email-row">
+        <input type="email" id="emailInput" placeholder="your@email.com">
+        <button class="btn-primary" onclick="submitEmail()">Book a demo</button>
+      </div>
+      <p class="micro-text">No spam. 30 minutes, no slides.</p>
+    </div>
+
+    <button class="retake-link" onclick="retake()">← Start over</button>
+  </div>
+</div>
+
+<script>
+let answers = {};
+let currentStep = 0;
+const totalSteps = 5;
+
+document.querySelectorAll('.opt').forEach(opt => {
+  opt.addEventListener('click', () => {
+    const radio = opt.querySelector('input[type="radio"]');
+    const name = radio.name;
+    const idx = parseInt(name.replace('q', ''));
+    document.querySelectorAll(`[name="${name}"]`).forEach(r => r.closest('.opt').classList.remove('selected'));
+    opt.classList.add('selected');
+    radio.checked = true;
+    answers[name] = radio.value;
+    const btn = document.getElementById(`btn-${idx}`);
+    if (btn) btn.disabled = false;
+  });
+});
+
+function updateProgress() {
+  document.getElementById('progressFill').style.width = ((currentStep / totalSteps) * 100) + '%';
+}
+function next(idx) {
+  if (!answers[`q${idx}`]) return;
+  document.getElementById(`step-${idx}`).classList.remove('active');
+  currentStep = idx + 1;
+  document.getElementById(`step-${currentStep}`).classList.add('active');
+  updateProgress();
+}
+function back(idx) {
+  document.getElementById(`step-${idx}`).classList.remove('active');
+  currentStep = idx - 1;
+  document.getElementById(`step-${currentStep}`).classList.add('active');
+  updateProgress();
+}
+
+function showResults() {
+  if (!answers.q4) return;
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+
+  const practiceType = answers.q0;
+  const clientCount = answers.q1;
+  const currentAdvisory = answers.q2;
+  const time = answers.q3;
+  const goal = answers.q4;
+
+  // Title personalisation
+  const practiceNames = { accountant: 'accounting practice', tech: 'tech advisory practice', msp: 'MSP', consultant: 'consultancy' };
+  document.getElementById('resultsTitle').textContent = `A three-tier service model for your ${practiceNames[practiceType]}.`;
+
+  // Tier definitions based on inputs
+  const tiers = buildTiers(practiceType, time, goal, clientCount, currentAdvisory);
+  document.getElementById('tiersGrid').innerHTML = tiers.map((t, i) =>
+    `<div class="tier-card ${i === 1 ? 'tier-featured' : ''}">
+      <div class="tier-top">
+        <span class="tier-name">${t.name}</span>
+        <span class="tier-cadence">${t.cadence}</span>
+      </div>
+      <div class="tier-positioning">${t.positioning}</div>
+      <ul class="tier-deliverables">${t.deliverables.map(d => `<li>${d}</li>`).join('')}</ul>
+    </div>`
+  ).join('');
+
+  // Context
+  const contextMessages = {
+    no: 'Starting from scratch is actually an advantage — you can design this cleanly without legacy commitments. Start with Tier 1 on 3–5 existing clients, get the workflow smooth, then roll it out.',
+    informal: 'You\'re already doing this work — just not charging for it systematically. Formalising it is mostly about documentation and pricing, not learning new skills.',
+    yes: 'You have a base to build on. The opportunity here is to systematise what\'s working and move higher-value clients into Tier 3 where the relationship deepens.'
+  };
+  document.getElementById('contextCard').innerHTML = `
+    <div class="context-title">Where to start</div>
+    <div class="context-text">${contextMessages[currentAdvisory]}</div>
+  `;
+}
+
+function buildTiers(type, time, goal, clientCount, existing) {
+  const isAccountant = type === 'accountant';
+  const isMSP = type === 'msp';
+  const isHighTime = time === 'high' || time === 'vhigh';
+
+  return [
+    {
+      name: 'Essentials',
+      cadence: 'Annual or one-off',
+      positioning: 'Entry-level. Gets clients on the map.',
+      deliverables: [
+        'Full software inventory from accounting data',
+        'Spend summary by category and vendor',
+        'Renewal risk report — tools coming up for renewal in 90 days',
+        isAccountant ? 'Reconcile software costs against budget' : 'Identify shadow IT and unmanaged tools',
+        'Written findings summary (1–2 pages)'
+      ]
+    },
+    {
+      name: 'Active',
+      cadence: 'Quarterly reviews',
+      positioning: 'Ongoing visibility and proactive advice.',
+      deliverables: [
+        'Everything in Essentials',
+        'Quarterly stack health check',
+        'Usage vs license comparison — unused seats flagged',
+        'Renewal alerts 60 days in advance',
+        isMSP ? 'Vendor consolidation recommendations' : 'Tool overlap and duplication report',
+        'Client-facing summary with recommended actions',
+        isHighTime ? '30-minute advisory call per quarter' : 'Async written recommendations'
+      ]
+    },
+    {
+      name: 'Strategic',
+      cadence: 'Monthly, with quarterly deep-dive',
+      positioning: 'Full advisory partnership — embedded and proactive.',
+      deliverables: [
+        'Everything in Active',
+        'Monthly stack snapshot and spend tracking',
+        'Optimisation roadmap — 3–6 month view',
+        'Vendor negotiation support',
+        'Benchmarking against similar businesses',
+        isAccountant ? 'Integrated into annual accounts and budgeting cycle' : 'Aligned to broader technology roadmap',
+        'Dedicated advisory calls — monthly',
+        'ROI tracking — document savings and outcomes'
+      ]
+    }
+  ];
+}
+
+function submitEmail() {
+  const email = document.getElementById('emailInput').value;
+  if (!email || !email.includes('@')) {
+    document.getElementById('emailInput').style.borderColor = 'var(--red)';
+    return;
+  }
+  document.querySelector('.cta-card').innerHTML = `<h3>Thanks — we'll be in touch.</h3><p style="margin-bottom:0">We'll reach out within one business day to book your 30-minute demo.</p>`;
+}
+
+function retake() {
+  answers = {}; currentStep = 0;
+  document.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+  document.querySelectorAll('.btn-primary[id^="btn-"]').forEach(b => b.disabled = true);
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  document.getElementById('step-0').classList.add('active');
+  for (let i = 1; i < totalSteps; i++) document.getElementById(`step-${i}`).classList.remove('active');
+  updateProgress();
+}
+</script>
+</body>
+</html>
