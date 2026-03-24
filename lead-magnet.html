@@ -4,97 +4,160 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SaaS Stack Diagnostic — AppVentory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --brand: #FF81E3;
-    --brand-dark: #e060c8;
-    --brand-light: #FFCDF4;
-    --brand-deep: #1C2C44;
-    --text: #1C2C44;
-    --text-muted: #5a6578;
-    --bg: #FFEBFB;
-    --card: #ffffff;
-    --border: #FFCDF4;
-    --red: #c0392b;
-    --amber: #d4880f;
-    --green: #1C2C44;
-    --radius: 10px;
-    --cream: #F7F3EA;
+    --bg:          #0d1520;
+    --surface:     #162032;
+    --surface-2:   #1e2f47;
+    --pink:        #FF81E3;
+    --pink-dim:    rgba(255,129,227,0.10);
+    --pink-border: rgba(255,129,227,0.22);
+    --white:       #ffffff;
+    --text:        #dde4ee;
+    --text-muted:  #8fa3bc;
+    --border:      rgba(255,255,255,0.075);
+    --border-hi:   rgba(255,255,255,0.13);
+    --red:         #e74c3c;
+    --red-bg:      rgba(231,76,60,0.12);
+    --amber:       #f39c12;
+    --amber-bg:    rgba(243,156,18,0.12);
+    --green:       #3ecf8e;
+    --green-bg:    rgba(62,207,142,0.10);
+    --radius:      12px;
+    --radius-sm:   8px;
   }
+
+  html { scroll-behavior: smooth; }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'DM Sans', sans-serif;
     background: var(--bg);
     color: var(--text);
-    line-height: 1.6;
+    line-height: 1.65;
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    font-size: 16px;
   }
 
+  /* ── Nav ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,21,32,0.90);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 6%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 58px;
+  }
+
+  .nav-logo {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--white);
+    text-decoration: none;
+    letter-spacing: -0.3px;
+  }
+
+  .nav-back {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .nav-back:hover { color: var(--white); }
+
+  /* ── Container ── */
   .container {
-    max-width: 640px;
+    max-width: 600px;
     margin: 0 auto;
-    padding: 24px 20px 48px;
+    padding: 40px 20px 72px;
   }
 
-  /* Header */
+  /* ── Header ── */
   .header {
     text-align: center;
-    padding: 40px 0 32px;
+    padding: 44px 0 36px;
   }
 
-  .header .logo {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--brand-deep);
-    letter-spacing: -0.3px;
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--pink);
+    border: 1px solid var(--pink-border);
+    padding: 5px 14px;
+    border-radius: 20px;
     margin-bottom: 20px;
   }
 
   .header h1 {
-    font-size: 28px;
+    font-family: 'Fraunces', serif;
     font-weight: 700;
-    line-height: 1.25;
-    color: var(--text);
+    font-size: clamp(26px, 4.5vw, 36px);
+    line-height: 1.15;
+    letter-spacing: -0.6px;
+    color: var(--white);
     margin-bottom: 12px;
-    letter-spacing: -0.5px;
   }
 
   .header p {
-    font-size: 16px;
+    font-size: 15px;
     color: var(--text-muted);
-    max-width: 480px;
+    max-width: 440px;
     margin: 0 auto;
+    line-height: 1.75;
   }
 
-  /* Progress */
+  /* ── Progress ── */
+  .progress-wrap {
+    margin: 28px 0;
+  }
+
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
   .progress-bar {
     width: 100%;
-    height: 4px;
+    height: 2px;
     background: var(--border);
     border-radius: 2px;
-    margin: 24px 0 32px;
     overflow: hidden;
   }
 
   .progress-fill {
     height: 100%;
-    background: var(--brand-deep);
+    background: var(--pink);
     border-radius: 2px;
     transition: width 0.4s ease;
     width: 0%;
   }
 
-  .step-label {
-    font-size: 13px;
-    color: var(--text-muted);
-    margin-bottom: 24px;
-  }
-
-  /* Question cards */
+  /* ── Question cards ── */
   .question-card {
-    background: var(--card);
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 32px 28px;
@@ -104,42 +167,47 @@
   .question-card.active { display: block; }
 
   .question-card h2 {
+    font-family: 'Fraunces', serif;
     font-size: 20px;
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 6px;
     letter-spacing: -0.3px;
+    color: var(--white);
+    line-height: 1.25;
   }
 
   .question-card .subtext {
     font-size: 14px;
     color: var(--text-muted);
     margin-bottom: 24px;
+    line-height: 1.65;
   }
 
-  /* Options */
-  .options { display: flex; flex-direction: column; gap: 10px; }
+  /* ── Options ── */
+  .options { display: flex; flex-direction: column; gap: 8px; }
 
   .option {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 14px 16px;
+    padding: 13px 16px;
     border: 1.5px solid var(--border);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all 0.15s ease;
-    font-size: 15px;
-    background: var(--card);
+    font-size: 14px;
+    background: var(--surface-2);
+    color: var(--text-muted);
   }
 
-  .option:hover { border-color: var(--brand); background: #FFF0FB; }
-  .option.selected { border-color: var(--brand); background: var(--brand-light); }
+  .option:hover { border-color: var(--pink-border); color: var(--text); }
+  .option.selected { border-color: var(--pink-border); background: var(--pink-dim); color: var(--white); }
 
   .option .radio {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
-    border: 2px solid var(--border);
+    border: 2px solid var(--border-hi);
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -148,100 +216,167 @@
   }
 
   .option.selected .radio {
-    border-color: var(--brand-deep);
-    background: var(--brand-deep);
+    border-color: var(--pink);
+    background: var(--pink);
   }
 
   .option.selected .radio::after {
     content: '';
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
-    background: white;
+    background: var(--bg);
   }
 
-  /* Slider input */
+  /* ── Slider ── */
   .slider-group { margin-top: 8px; }
 
   .slider-group input[type="range"] {
     width: 100%;
-    margin: 12px 0;
-    accent-color: var(--brand-deep);
-    height: 6px;
+    margin: 16px 0 10px;
+    accent-color: var(--pink);
+    height: 4px;
+    cursor: pointer;
   }
 
   .slider-labels {
     display: flex;
     justify-content: space-between;
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-muted);
   }
 
   .slider-value {
-    font-size: 32px;
-    font-weight: 700;
-    color: var(--brand-deep);
+    font-family: 'Fraunces', serif;
+    font-size: 52px;
+    font-weight: 900;
+    color: var(--pink);
     text-align: center;
     margin-bottom: 4px;
+    letter-spacing: -3px;
+    line-height: 1;
   }
 
   .slider-value span {
     font-size: 16px;
     font-weight: 400;
     color: var(--text-muted);
+    letter-spacing: 0;
+    font-family: 'DM Sans', sans-serif;
   }
 
-  /* Navigation */
+  /* ── Navigation buttons ── */
   .nav-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 24px;
+    margin-top: 28px;
   }
 
   .btn {
-    padding: 12px 28px;
-    border-radius: 8px;
-    font-size: 15px;
+    padding: 11px 26px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     border: none;
     transition: all 0.15s ease;
+    font-family: 'DM Sans', sans-serif;
   }
 
   .btn-primary {
-    background: var(--brand-deep);
-    color: white;
+    background: var(--pink);
+    color: var(--bg);
   }
 
-  .btn-primary:hover { background: #253a56; }
-  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-primary:disabled { opacity: 0.3; cursor: not-allowed; }
 
   .btn-back {
     background: none;
     color: var(--text-muted);
-    padding: 12px 16px;
+    padding: 11px 0;
+    font-size: 13px;
   }
 
   .btn-back:hover { color: var(--text); }
 
-  /* Results */
+  /* ══════════════════════════════
+     RESULTS
+  ══════════════════════════════ */
   .results-screen { display: none; }
   .results-screen.active { display: block; }
 
-  .score-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 36px 28px;
+  /* Results header */
+  .results-header {
     text-align: center;
+    padding: 8px 0 32px;
+  }
+
+  .grade-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--surface);
+    border: 1px solid var(--border-hi);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     margin-bottom: 20px;
   }
 
+  .grade-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .results-header h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(24px, 4vw, 32px);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--white);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .results-header p {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  /* Score card */
+  .score-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 40px 32px;
+    text-align: center;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .score-card::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 240px; height: 240px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,129,227,0.06) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
   .score-ring {
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 20px;
+    width: 130px;
+    height: 130px;
+    margin: 0 auto 24px;
     position: relative;
   }
 
@@ -252,184 +387,382 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 36px;
-    font-weight: 700;
+    font-family: 'Fraunces', serif;
+    font-size: 40px;
+    font-weight: 900;
+    color: var(--white);
+    letter-spacing: -2px;
   }
 
   .score-label {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 8px;
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 10px;
+    letter-spacing: -0.3px;
   }
 
   .score-summary {
-    font-size: 15px;
+    font-size: 14px;
     color: var(--text-muted);
-    max-width: 420px;
+    max-width: 400px;
     margin: 0 auto;
+    line-height: 1.75;
+  }
+
+  /* Section label */
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--pink);
+    margin: 24px 0 10px;
   }
 
   /* Finding cards */
   .finding {
-    background: var(--card);
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 24px;
-    margin-bottom: 12px;
+    padding: 20px 20px 20px 26px;
+    margin-bottom: 8px;
+    position: relative;
+    overflow: hidden;
   }
 
-  .finding-header {
+  .finding-accent {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    border-radius: 3px 0 0 3px;
+  }
+
+  .finding-accent.red  { background: var(--red); }
+  .finding-accent.amber { background: var(--amber); }
+  .finding-accent.green { background: var(--green); }
+
+  .finding-tag {
+    display: inline-flex;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: 3px 9px;
+    border-radius: 20px;
+    margin-bottom: 7px;
+  }
+
+  .finding-tag.red   { background: var(--red-bg);   color: var(--red); }
+  .finding-tag.amber { background: var(--amber-bg); color: var(--amber); }
+  .finding-tag.green { background: var(--green-bg); color: var(--green); }
+
+  .finding h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 5px;
+  }
+
+  .finding p {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  /* Cost block */
+  .cost-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-bottom: 8px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 20px;
+  }
+
+  .cost-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-hi);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .cost-amount {
+    font-family: 'Fraunces', serif;
+    font-size: 38px;
+    font-weight: 900;
+    color: var(--green);
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .cost-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* Next steps */
+  .next-steps {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 28px;
     margin-bottom: 8px;
   }
 
-  .finding-icon {
-    width: 28px;
-    height: 28px;
+  .next-steps-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 18px;
+  }
+
+  .step-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+
+  .step-item:last-child { margin-bottom: 0; }
+
+  .step-num {
+    width: 22px;
+    height: 22px;
+    background: var(--pink-dim);
+    border: 1px solid var(--pink-border);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
-    flex-shrink: 0;
-  }
-
-  .finding-icon.red { background: #fdecea; color: var(--red); }
-  .finding-icon.amber { background: #fef5e7; color: var(--amber); }
-  .finding-icon.green { background: var(--brand-light); color: var(--brand-deep); }
-
-  .finding h3 { font-size: 16px; font-weight: 600; }
-
-  .finding p {
-    font-size: 14px;
-    color: var(--text-muted);
-    margin-left: 38px;
-  }
-
-  .estimated-cost {
-    background: var(--cream);
-    border: 1px solid #e8dfd2;
-    border-radius: var(--radius);
-    padding: 24px;
-    margin: 24px 0;
-    text-align: center;
-  }
-
-  .estimated-cost .amount {
-    font-size: 36px;
+    font-size: 11px;
     font-weight: 700;
-    color: var(--brand-deep);
-    margin-bottom: 4px;
+    color: var(--pink);
+    flex-shrink: 0;
+    margin-top: 1px;
   }
 
-  .estimated-cost .label {
-    font-size: 14px;
+  .step-text {
+    font-size: 13px;
     color: var(--text-muted);
+    line-height: 1.65;
   }
 
-  /* CTA */
+  .step-text strong { color: var(--text); font-weight: 600; }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 28px 0;
+  }
+
+  /* CTA card */
   .cta-card {
-    background: var(--brand-deep);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 36px 28px;
+    padding: 36px 32px;
     text-align: center;
-    margin-top: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-card::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,129,227,0.06) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .cta-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--pink);
+    margin-bottom: 10px;
   }
 
   .cta-card h3 {
-    color: white;
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 8px;
+    font-family: 'Fraunces', serif;
+    color: var(--white);
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: -0.4px;
+    line-height: 1.2;
   }
 
-  .cta-card p {
-    color: rgba(255,255,255,0.8);
-    font-size: 15px;
-    margin-bottom: 24px;
+  .cta-card > p {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 28px;
+    max-width: 380px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.75;
   }
 
   .email-row {
     display: flex;
     gap: 8px;
     max-width: 420px;
-    margin: 0 auto;
+    margin: 0 auto 12px;
   }
 
   .email-row input {
     flex: 1;
     padding: 12px 16px;
-    border-radius: 8px;
-    border: none;
-    font-size: 15px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border-hi);
+    background: var(--surface-2);
+    font-size: 14px;
     outline: none;
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.15s;
   }
 
-  .email-row input::placeholder { color: #999; }
+  .email-row input::placeholder { color: var(--text-muted); }
+  .email-row input:focus { border-color: var(--pink-border); }
 
-  .email-row .btn {
-    background: var(--brand);
-    color: var(--brand-deep);
+  .email-row .btn-cta {
+    background: var(--pink);
+    color: var(--bg);
     white-space: nowrap;
     font-weight: 700;
+    padding: 12px 22px;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: opacity 0.15s;
   }
 
-  .email-row .btn:hover { background: var(--brand-dark); }
+  .email-row .btn-cta:hover { opacity: 0.88; }
 
   .cta-note {
-    color: rgba(255,255,255,0.6);
+    color: var(--text-muted);
     font-size: 12px;
-    margin-top: 12px;
+    opacity: 0.7;
   }
 
+  /* Success state */
   .success-msg {
-    color: white;
-    font-size: 16px;
-    font-weight: 600;
     display: none;
-    padding: 16px 0;
+    padding: 20px 0;
+  }
+
+  .success-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--green-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
+    font-size: 20px;
+    color: var(--green);
+  }
+
+  .success-msg h4 {
+    color: var(--white);
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .success-msg p {
+    color: var(--text-muted);
+    font-size: 14px;
   }
 
   .restart-link {
     display: inline-block;
-    margin-top: 24px;
-    color: var(--brand);
-    font-size: 14px;
+    margin-top: 28px;
+    color: var(--text-muted);
+    font-size: 13px;
     cursor: pointer;
-    text-decoration: underline;
+    text-decoration: none;
+    transition: color 0.15s;
   }
+  .restart-link:hover { color: var(--text); }
 
   /* Mobile */
   @media (max-width: 480px) {
-    .container { padding: 16px 16px 40px; }
-    .header h1 { font-size: 24px; }
+    nav { padding: 0 20px; }
+    .container { padding: 24px 16px 56px; }
+    .header { padding: 32px 0 28px; }
     .question-card { padding: 24px 20px; }
-    .score-card { padding: 28px 20px; }
+    .score-card { padding: 32px 20px; }
+    .cost-block { flex-direction: column; gap: 12px; }
     .email-row { flex-direction: column; }
-    .email-row .btn { width: 100%; }
+    .email-row .btn-cta { width: 100%; }
     .cta-card { padding: 28px 20px; }
   }
 </style>
 </head>
 <body>
 
+<!-- Netlify Forms detection -->
+<form name="saas-diagnostic" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input type="email" name="email" />
+  <input type="hidden" name="appCount" />
+  <input type="hidden" name="spend" />
+  <input type="hidden" name="tracking" />
+  <input type="hidden" name="renewals" />
+  <input type="hidden" name="overlap" />
+  <input type="hidden" name="role" />
+  <input type="hidden" name="score" />
+</form>
+
+<!-- Nav -->
+<nav>
+  <a href="index.html" class="nav-logo">AppVentory</a>
+  <a href="index.html" class="nav-back">← Back to home</a>
+</nav>
+
 <div class="container">
+
   <!-- Header -->
-  <div class="header">
-    <div class="logo">AppVentory</div>
+  <div class="header" id="mainHeader">
+    <div class="eyebrow">Free tool · 2 minutes</div>
     <h1>How healthy is your client's SaaS stack?</h1>
-    <p>Answer 6 quick questions. Get a personalised diagnostic with specific findings you can act on.</p>
+    <p>Answer 6 questions. Get a personalised risk score, specific findings, and an estimated savings opportunity.</p>
   </div>
 
-  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-  <div class="step-label" id="stepLabel">Question 1 of 6</div>
+  <!-- Progress -->
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-meta">
+      <span id="stepLabel">Question 1 of 6</span>
+      <span id="pctLabel">0% complete</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
 
-  <!-- Q1: How many apps -->
+  <!-- Q1 -->
   <div class="question-card active" data-step="1">
     <h2>How many SaaS tools does the business use?</h2>
-    <p class="subtext">Include everything: accounting, CRM, project management, communication, design, etc.</p>
+    <p class="subtext">Include everything: accounting, CRM, project management, communication, design, and anything in between.</p>
     <div class="slider-group">
       <div class="slider-value" id="appCountDisplay">25 <span>apps</span></div>
       <input type="range" id="appCount" min="5" max="100" value="25" step="5">
@@ -437,170 +770,159 @@
     </div>
     <div class="nav-row">
       <div></div>
-      <button class="btn btn-primary" onclick="nextStep()">Next</button>
+      <button class="btn btn-primary" onclick="nextStep()">Next →</button>
     </div>
   </div>
 
-  <!-- Q2: Monthly spend -->
+  <!-- Q2 -->
   <div class="question-card" data-step="2">
     <h2>What's the estimated monthly SaaS spend?</h2>
-    <p class="subtext">Your best guess is fine. Include all recurring software subscriptions.</p>
+    <p class="subtext">Your best guess is fine — include all recurring software subscriptions.</p>
     <div class="options">
-      <div class="option" onclick="selectOption(this, 'spend', 'under2k')">
-        <div class="radio"></div>Under $2,000/mo
-      </div>
-      <div class="option" onclick="selectOption(this, 'spend', '2k-5k')">
-        <div class="radio"></div>$2,000 – $5,000/mo
-      </div>
-      <div class="option" onclick="selectOption(this, 'spend', '5k-15k')">
-        <div class="radio"></div>$5,000 – $15,000/mo
-      </div>
-      <div class="option" onclick="selectOption(this, 'spend', '15k-plus')">
-        <div class="radio"></div>$15,000+/mo
-      </div>
+      <div class="option" onclick="selectOption(this,'spend','under2k')"><div class="radio"></div>Under $2,000 / month</div>
+      <div class="option" onclick="selectOption(this,'spend','2k-5k')"><div class="radio"></div>$2,000 – $5,000 / month</div>
+      <div class="option" onclick="selectOption(this,'spend','5k-15k')"><div class="radio"></div>$5,000 – $15,000 / month</div>
+      <div class="option" onclick="selectOption(this,'spend','15k-plus')"><div class="radio"></div>$15,000+ / month</div>
     </div>
     <div class="nav-row">
-      <button class="btn btn-back" onclick="prevStep()">Back</button>
-      <button class="btn btn-primary" id="btn2" disabled onclick="nextStep()">Next</button>
+      <button class="btn btn-back" onclick="prevStep()">← Back</button>
+      <button class="btn btn-primary" id="btn2" disabled onclick="nextStep()">Next →</button>
     </div>
   </div>
 
-  <!-- Q3: Tracking method -->
+  <!-- Q3 -->
   <div class="question-card" data-step="3">
     <h2>How are subscriptions currently tracked?</h2>
-    <p class="subtext">Pick the option closest to how things work today.</p>
+    <p class="subtext">Pick the option that best describes how things work today.</p>
     <div class="options">
-      <div class="option" onclick="selectOption(this, 'tracking', 'not-tracked')">
-        <div class="radio"></div>They're not — nobody has a full picture
-      </div>
-      <div class="option" onclick="selectOption(this, 'tracking', 'spreadsheet')">
-        <div class="radio"></div>Spreadsheet or document (manually updated)
-      </div>
-      <div class="option" onclick="selectOption(this, 'tracking', 'accounting')">
-        <div class="radio"></div>We check the accounting software when needed
-      </div>
-      <div class="option" onclick="selectOption(this, 'tracking', 'tool')">
-        <div class="radio"></div>We use a dedicated SaaS management tool
-      </div>
+      <div class="option" onclick="selectOption(this,'tracking','not-tracked')"><div class="radio"></div>They're not — nobody has a full picture</div>
+      <div class="option" onclick="selectOption(this,'tracking','spreadsheet')"><div class="radio"></div>Spreadsheet or document (manually updated)</div>
+      <div class="option" onclick="selectOption(this,'tracking','accounting')"><div class="radio"></div>We check the accounting software when needed</div>
+      <div class="option" onclick="selectOption(this,'tracking','tool')"><div class="radio"></div>We use a dedicated SaaS management tool</div>
     </div>
     <div class="nav-row">
-      <button class="btn btn-back" onclick="prevStep()">Back</button>
-      <button class="btn btn-primary" id="btn3" disabled onclick="nextStep()">Next</button>
+      <button class="btn btn-back" onclick="prevStep()">← Back</button>
+      <button class="btn btn-primary" id="btn3" disabled onclick="nextStep()">Next →</button>
     </div>
   </div>
 
-  <!-- Q4: Renewal awareness -->
+  <!-- Q4 -->
   <div class="question-card" data-step="4">
     <h2>Do you know when renewals are coming up?</h2>
-    <p class="subtext">Think about the next 90 days — could you list every renewal and its date?</p>
+    <p class="subtext">Think about the next 90 days — could you list every renewal with its date and amount?</p>
     <div class="options">
-      <div class="option" onclick="selectOption(this, 'renewals', 'no-idea')">
-        <div class="radio"></div>No — renewals happen and we find out after
-      </div>
-      <div class="option" onclick="selectOption(this, 'renewals', 'some')">
-        <div class="radio"></div>We know the big ones, but not the smaller tools
-      </div>
-      <div class="option" onclick="selectOption(this, 'renewals', 'mostly')">
-        <div class="radio"></div>We have a rough calendar, but it's not complete
-      </div>
-      <div class="option" onclick="selectOption(this, 'renewals', 'yes')">
-        <div class="radio"></div>Yes — every renewal is tracked with dates and amounts
-      </div>
+      <div class="option" onclick="selectOption(this,'renewals','no-idea')"><div class="radio"></div>No — renewals happen and we find out after</div>
+      <div class="option" onclick="selectOption(this,'renewals','some')"><div class="radio"></div>We know the big ones, but not the smaller tools</div>
+      <div class="option" onclick="selectOption(this,'renewals','mostly')"><div class="radio"></div>We have a rough calendar, but it's incomplete</div>
+      <div class="option" onclick="selectOption(this,'renewals','yes')"><div class="radio"></div>Yes — every renewal is tracked with dates and costs</div>
     </div>
     <div class="nav-row">
-      <button class="btn btn-back" onclick="prevStep()">Back</button>
-      <button class="btn btn-primary" id="btn4" disabled onclick="nextStep()">Next</button>
+      <button class="btn btn-back" onclick="prevStep()">← Back</button>
+      <button class="btn btn-primary" id="btn4" disabled onclick="nextStep()">Next →</button>
     </div>
   </div>
 
-  <!-- Q5: Overlap / duplication -->
+  <!-- Q5 -->
   <div class="question-card" data-step="5">
     <h2>Are there tools that do the same thing?</h2>
-    <p class="subtext">Overlapping tools are common — e.g., Slack and Teams, Asana and Monday, Dropbox and Google Drive.</p>
+    <p class="subtext">Overlapping tools are common — Slack and Teams, Asana and Monday, Dropbox and Google Drive.</p>
     <div class="options">
-      <div class="option" onclick="selectOption(this, 'overlap', 'definitely')">
-        <div class="radio"></div>Definitely — there are overlapping tools
-      </div>
-      <div class="option" onclick="selectOption(this, 'overlap', 'probably')">
-        <div class="radio"></div>Probably, but nobody's checked properly
-      </div>
-      <div class="option" onclick="selectOption(this, 'overlap', 'unlikely')">
-        <div class="radio"></div>Unlikely — the stack is fairly lean
-      </div>
-      <div class="option" onclick="selectOption(this, 'overlap', 'no')">
-        <div class="radio"></div>No — every tool has a distinct purpose
-      </div>
+      <div class="option" onclick="selectOption(this,'overlap','definitely')"><div class="radio"></div>Definitely — there are known overlapping tools</div>
+      <div class="option" onclick="selectOption(this,'overlap','probably')"><div class="radio"></div>Probably, but nobody's checked properly</div>
+      <div class="option" onclick="selectOption(this,'overlap','unlikely')"><div class="radio"></div>Unlikely — the stack is fairly lean</div>
+      <div class="option" onclick="selectOption(this,'overlap','no')"><div class="radio"></div>No — every tool has a clear, distinct purpose</div>
     </div>
     <div class="nav-row">
-      <button class="btn btn-back" onclick="prevStep()">Back</button>
-      <button class="btn btn-primary" id="btn5" disabled onclick="nextStep()">Next</button>
+      <button class="btn btn-back" onclick="prevStep()">← Back</button>
+      <button class="btn btn-primary" id="btn5" disabled onclick="nextStep()">Next →</button>
     </div>
   </div>
 
-  <!-- Q6: User context -->
+  <!-- Q6 -->
   <div class="question-card" data-step="6">
     <h2>Who are you doing this for?</h2>
-    <p class="subtext">This helps us tailor the findings.</p>
+    <p class="subtext">This helps tailor the findings and next steps.</p>
     <div class="options">
-      <div class="option" onclick="selectOption(this, 'role', 'advisor')">
-        <div class="radio"></div>I'm an advisor reviewing a client's stack
-      </div>
-      <div class="option" onclick="selectOption(this, 'role', 'founder')">
-        <div class="radio"></div>I'm a founder or operator managing my own business
-      </div>
-      <div class="option" onclick="selectOption(this, 'role', 'finance')">
-        <div class="radio"></div>I'm in finance trying to get costs under control
-      </div>
-      <div class="option" onclick="selectOption(this, 'role', 'it')">
-        <div class="radio"></div>I'm in IT or operations
-      </div>
+      <div class="option" onclick="selectOption(this,'role','advisor')"><div class="radio"></div>I'm an advisor reviewing a client's stack</div>
+      <div class="option" onclick="selectOption(this,'role','founder')"><div class="radio"></div>I'm a founder or operator managing my own business</div>
+      <div class="option" onclick="selectOption(this,'role','finance')"><div class="radio"></div>I'm in finance trying to get costs under control</div>
+      <div class="option" onclick="selectOption(this,'role','it')"><div class="radio"></div>I'm in IT or operations</div>
     </div>
     <div class="nav-row">
-      <button class="btn btn-back" onclick="prevStep()">Back</button>
-      <button class="btn btn-primary" id="btn6" disabled onclick="showResults()">See my results</button>
+      <button class="btn btn-back" onclick="prevStep()">← Back</button>
+      <button class="btn btn-primary" id="btn6" disabled onclick="showResults()">See my results →</button>
     </div>
   </div>
 
-  <!-- Results -->
+  <!-- ══ RESULTS ══ -->
   <div class="results-screen" id="resultsScreen">
+
+    <div class="results-header">
+      <div class="grade-badge">
+        <div class="grade-dot" id="gradeDot"></div>
+        <span id="gradeText">Stack Diagnostic</span>
+      </div>
+      <h1>Your SaaS Stack Report</h1>
+      <p>Based on your answers — here's what the data suggests.</p>
+    </div>
+
+    <!-- Score -->
     <div class="score-card">
       <div class="score-ring">
-        <svg width="120" height="120" viewBox="0 0 120 120">
-          <circle cx="60" cy="60" r="52" fill="none" stroke="#e0e0e0" stroke-width="8"/>
-          <circle id="scoreArc" cx="60" cy="60" r="52" fill="none" stroke-width="8" stroke-linecap="round"
-            stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+        <svg width="130" height="130" viewBox="0 0 130 130">
+          <circle cx="65" cy="65" r="56" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="8"/>
+          <circle id="scoreArc" cx="65" cy="65" r="56" fill="none" stroke-width="8" stroke-linecap="round"
+            stroke-dasharray="351.9" stroke-dashoffset="351.9"/>
         </svg>
-        <div class="score-number" id="scoreNumber">--</div>
+        <div class="score-number" id="scoreNumber">0</div>
       </div>
       <div class="score-label" id="scoreLabel"></div>
       <div class="score-summary" id="scoreSummary"></div>
     </div>
 
+    <!-- Findings -->
+    <div class="section-label">What we found</div>
     <div id="findingsContainer"></div>
 
-    <div class="estimated-cost" id="costEstimate">
-      <div class="amount" id="costAmount"></div>
-      <div class="label" id="costLabel"></div>
+    <!-- Cost estimate -->
+    <div class="section-label">Estimated opportunity</div>
+    <div class="cost-block">
+      <div class="cost-icon">💰</div>
+      <div>
+        <div class="cost-amount" id="costAmount"></div>
+        <div class="cost-label" id="costLabel"></div>
+      </div>
     </div>
 
+    <!-- Next steps -->
+    <div class="section-label">Where to focus first</div>
+    <div class="next-steps" id="nextStepsBlock"></div>
+
+    <div class="divider"></div>
+
+    <!-- CTA -->
     <div class="cta-card">
+      <div class="cta-eyebrow">AppVentory</div>
       <h3 id="ctaHeadline"></h3>
       <p id="ctaSubtext"></p>
       <div id="ctaForm">
         <div class="email-row">
-          <input type="email" id="emailInput" placeholder="you@company.com">
-          <button class="btn" onclick="submitEmail()">Get my full report</button>
+          <input type="email" id="emailInput" placeholder="your@email.com" autocomplete="email">
+          <button class="btn-cta" onclick="submitEmail()">Book a demo</button>
         </div>
-        <div class="cta-note">No spam. Just your personalised diagnostic breakdown.</div>
+        <div class="cta-note">30-minute call. No setup required.</div>
       </div>
       <div class="success-msg" id="successMsg">
-        &#10003; We'll send your full report shortly.
+        <div class="success-icon">✓</div>
+        <h4>You're booked in.</h4>
+        <p>We'll be in touch shortly to confirm your demo time.</p>
       </div>
     </div>
 
-    <div style="text-align: center;">
-      <span class="restart-link" onclick="restart()">Retake the diagnostic</span>
+    <div style="text-align:center;">
+      <span class="restart-link" onclick="restart()">← Retake the diagnostic</span>
     </div>
+
   </div>
 </div>
 
@@ -613,7 +935,7 @@
   const appDisplay = document.getElementById('appCountDisplay');
 
   appSlider.addEventListener('input', () => {
-    const v = appSlider.value;
+    const v = parseInt(appSlider.value);
     appDisplay.innerHTML = v >= 100 ? '100+ <span>apps</span>' : v + ' <span>apps</span>';
   });
 
@@ -627,15 +949,17 @@
   }
 
   function updateProgress() {
-    const pct = ((currentStep - 1) / totalSteps) * 100;
+    const pct = Math.round(((currentStep - 1) / totalSteps) * 100);
     document.getElementById('progressFill').style.width = pct + '%';
     document.getElementById('stepLabel').textContent = 'Question ' + currentStep + ' of ' + totalSteps;
+    document.getElementById('pctLabel').textContent = pct + '% complete';
   }
 
   function showStep(n) {
     document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
     document.querySelector('[data-step="' + n + '"]').classList.add('active');
     updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function nextStep() {
@@ -649,218 +973,214 @@
 
   function calcScore() {
     let score = 100;
-
-    // App count risk
     if (answers.appCount >= 60) score -= 20;
     else if (answers.appCount >= 35) score -= 12;
     else if (answers.appCount >= 20) score -= 6;
-
-    // Spend level
     if (answers.spend === '15k-plus') score -= 10;
     else if (answers.spend === '5k-15k') score -= 6;
     else if (answers.spend === '2k-5k') score -= 3;
-
-    // Tracking method
     if (answers.tracking === 'not-tracked') score -= 25;
     else if (answers.tracking === 'spreadsheet') score -= 15;
     else if (answers.tracking === 'accounting') score -= 8;
-
-    // Renewals
     if (answers.renewals === 'no-idea') score -= 20;
     else if (answers.renewals === 'some') score -= 12;
     else if (answers.renewals === 'mostly') score -= 5;
-
-    // Overlap
     if (answers.overlap === 'definitely') score -= 18;
     else if (answers.overlap === 'probably') score -= 12;
     else if (answers.overlap === 'unlikely') score -= 3;
-
     return Math.max(10, Math.min(100, score));
   }
 
   function getSpendMonthly() {
-    const map = { 'under2k': 1500, '2k-5k': 3500, '5k-15k': 10000, '15k-plus': 22000 };
-    return map[answers.spend] || 3500;
+    return { 'under2k': 1500, '2k-5k': 3500, '5k-15k': 10000, '15k-plus': 22000 }[answers.spend] || 3500;
   }
 
   function buildFindings(score) {
-    const findings = [];
-
-    // Tracking finding
+    const f = [];
     if (answers.tracking === 'not-tracked' || answers.tracking === 'spreadsheet') {
-      findings.push({
-        severity: 'red',
-        icon: '!',
-        title: 'No reliable subscription inventory',
+      f.push({ severity: 'red', tag: 'High Risk', title: 'No reliable subscription inventory',
         desc: answers.tracking === 'not-tracked'
           ? 'Without any tracking, subscriptions accumulate unnoticed. Businesses in this position typically have 20–40% more active subscriptions than anyone realises.'
-          : 'Manual spreadsheets go stale within weeks. They miss new sign-ups, price changes, and cancelled tools that keep billing.'
-      });
+          : 'Manual spreadsheets go stale within weeks. They miss new sign-ups, price changes, and cancelled tools that keep billing.' });
     } else if (answers.tracking === 'accounting') {
-      findings.push({
-        severity: 'amber',
-        icon: '~',
-        title: 'Accounting data is underutilised',
-        desc: 'The spending data is there — it\'s just not being structured into a live inventory. This is actually the fastest path to full discovery.'
-      });
+      f.push({ severity: 'amber', tag: 'Opportunity', title: 'Accounting data is underutilised',
+        desc: 'The spending data is already there — it\'s just not structured into a live inventory. This is the fastest path to full visibility.' });
     }
-
-    // Renewal finding
     if (answers.renewals === 'no-idea' || answers.renewals === 'some') {
-      findings.push({
-        severity: 'red',
-        icon: '!',
-        title: 'Renewal blind spots',
+      f.push({ severity: 'red', tag: 'High Risk', title: 'Renewal blind spots',
         desc: answers.renewals === 'no-idea'
           ? 'Auto-renewals are running unchecked. This is the single biggest source of preventable SaaS waste — tools renew at full price with nobody reviewing them.'
-          : 'The smaller tools add up. Missed renewals on $50–$300/mo subscriptions compound quickly across a full stack.'
-      });
+          : 'Smaller tools add up fast. Missed renewals on $50–$300/mo subscriptions compound quickly across a full stack.' });
     } else if (answers.renewals === 'mostly') {
-      findings.push({
-        severity: 'amber',
-        icon: '~',
-        title: 'Renewal tracking has gaps',
-        desc: 'Most renewals are known, but the incomplete ones tend to be the ones that slip through without review.'
-      });
+      f.push({ severity: 'amber', tag: 'Moderate Risk', title: 'Renewal tracking has gaps',
+        desc: 'Most renewals are known, but the incomplete ones tend to be the ones that slip through without review.' });
     }
-
-    // Overlap finding
     if (answers.overlap === 'definitely' || answers.overlap === 'probably') {
-      findings.push({
-        severity: answers.overlap === 'definitely' ? 'red' : 'amber',
-        icon: answers.overlap === 'definitely' ? '!' : '~',
+      f.push({ severity: answers.overlap === 'definitely' ? 'red' : 'amber',
+        tag: answers.overlap === 'definitely' ? 'High Risk' : 'Moderate Risk',
         title: 'Likely tool duplication',
         desc: answers.overlap === 'definitely'
-          ? 'Known overlaps mean there\'s spend going to tools that could be consolidated. Even one duplicate tool at $200/mo is $2,400/yr with no return.'
-          : 'Unchecked overlap is common — most businesses discover 2–5 tools doing the same job once they look properly.'
-      });
+          ? 'Known overlaps mean spend is going to tools that could be consolidated. Even one duplicate at $200/mo is $2,400/yr with zero return.'
+          : 'Most businesses discover 2–5 tools doing the same job once they look properly.' });
     }
-
-    // Scale finding
     if (answers.appCount >= 35) {
-      findings.push({
-        severity: 'amber',
-        icon: '~',
-        title: 'Stack complexity is high',
-        desc: answers.appCount + ' tools is a large stack for an SMB. Without structured management, each new tool adds cost and risk without anyone evaluating the full picture.'
-      });
+      f.push({ severity: 'amber', tag: 'Complexity', title: 'Stack complexity is high',
+        desc: answers.appCount + ' tools is a large stack. Without structured oversight, each new tool adds cost and risk without anyone evaluating the full picture.' });
     }
-
-    // Positive finding
     if (score >= 70) {
-      findings.push({
-        severity: 'green',
-        icon: '✓',
-        title: 'Some fundamentals are in place',
-        desc: 'The business has some tracking and awareness. The opportunity is to move from ad hoc checks to a structured, ongoing process.'
-      });
+      f.push({ severity: 'green', tag: 'Positive', title: 'Some fundamentals are in place',
+        desc: 'The business has some tracking and awareness. The opportunity is to move from ad hoc checks to a structured, ongoing process.' });
     }
+    return f;
+  }
 
-    return findings;
+  function buildNextSteps() {
+    const isAdvisor = answers.role === 'advisor';
+    if (isAdvisor) {
+      return [
+        { title: 'Map the full stack from accounting data', text: 'Connect the client\'s accounting software to surface every subscription automatically — no manual entry needed.' },
+        { title: 'Identify renewals in the next 90 days', text: 'Build a renewal calendar and flag which tools are coming up for review before auto-renewal hits.' },
+        { title: 'Present findings as a structured review', text: 'Use the data to produce a client-ready report showing waste, risk, and recommended actions.' }
+      ];
+    }
+    return [
+      { title: 'Get a complete picture of what you\'re paying for', text: 'Connect your accounting software to discover every active subscription — including ones you\'ve forgotten about.' },
+      { title: 'Review renewals in the next 90 days', text: 'See what\'s auto-renewing and decide whether each tool is still earning its place.' },
+      { title: 'Eliminate the overlap', text: 'Identify tools doing the same job and consolidate — most businesses find 2–4 immediate cancellations.' }
+    ];
   }
 
   function showResults() {
     const score = calcScore();
     const monthly = getSpendMonthly();
     const findings = buildFindings(score);
+    const steps = buildNextSteps();
 
-    // Hide question UI
     document.querySelectorAll('.question-card').forEach(c => c.classList.remove('active'));
-    document.querySelector('.progress-bar').style.display = 'none';
-    document.getElementById('stepLabel').style.display = 'none';
+    document.getElementById('progressWrap').style.display = 'none';
+    document.getElementById('mainHeader').style.display = 'none';
+
+    // Grade badge
+    const gradeColor = score >= 70 ? '#3ecf8e' : score >= 45 ? '#f39c12' : '#e74c3c';
+    const gradeLabel = score >= 70 ? 'Moderate Risk' : score >= 45 ? 'Significant Risk' : 'High Risk';
+    document.getElementById('gradeDot').style.background = gradeColor;
+    document.getElementById('gradeText').textContent = gradeLabel;
 
     // Score ring
     const arc = document.getElementById('scoreArc');
-    const circumference = 326.7;
-    const offset = circumference - (score / 100) * circumference;
-    let ringColor = score >= 70 ? '#1C2C44' : score >= 45 ? '#d4880f' : '#c0392b';
+    const ringColor = score >= 70 ? '#FF81E3' : score >= 45 ? '#f39c12' : '#e74c3c';
     arc.style.stroke = ringColor;
+    const offset = 351.9 - (score / 100) * 351.9;
+    setTimeout(() => {
+      arc.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)';
+      arc.style.strokeDashoffset = offset;
+    }, 80);
 
     const scoreEl = document.getElementById('scoreNumber');
-    scoreEl.style.color = ringColor;
-
-    // Animate score
-    setTimeout(() => { arc.style.transition = 'stroke-dashoffset 1s ease'; arc.style.strokeDashoffset = offset; }, 50);
     let counter = 0;
-    const target = score;
     const interval = setInterval(() => {
-      counter += 1;
+      counter++;
       scoreEl.textContent = counter;
-      if (counter >= target) clearInterval(interval);
-    }, 15);
+      if (counter >= score) clearInterval(interval);
+    }, 18);
 
-    // Score label
-    const labelEl = document.getElementById('scoreLabel');
-    const summaryEl = document.getElementById('scoreSummary');
-    if (score >= 70) {
-      labelEl.textContent = 'Moderate risk';
-      summaryEl.textContent = 'The foundations are there, but there are clear gaps that are likely costing money. A structured review would surface specific savings.';
-    } else if (score >= 45) {
-      labelEl.textContent = 'Significant risk';
-      summaryEl.textContent = 'Multiple areas of the stack are unmanaged. Subscriptions are renewing, overlapping, and accumulating without oversight.';
-    } else {
-      labelEl.textContent = 'High risk';
-      summaryEl.textContent = 'This stack is largely unmanaged. There is almost certainly meaningful spend going to tools that are unused, duplicated, or overpriced.';
-    }
+    // Labels
+    const labels = {
+      high: ['High Risk', 'This stack is largely unmanaged. There is almost certainly meaningful spend going to tools that are unused, duplicated, or overpriced.'],
+      mid:  ['Significant Risk', 'Multiple areas of the stack are unmanaged. Subscriptions are renewing, overlapping, and accumulating without oversight.'],
+      low:  ['Moderate Risk', 'The foundations are there, but there are clear gaps that are likely costing money. A structured review would surface specific savings.']
+    };
+    const lv = score >= 70 ? labels.low : score >= 45 ? labels.mid : labels.high;
+    document.getElementById('scoreLabel').textContent = lv[0];
+    document.getElementById('scoreSummary').textContent = lv[1];
 
     // Findings
     const container = document.getElementById('findingsContainer');
-    container.innerHTML = '';
-    findings.forEach(f => {
-      container.innerHTML += '<div class="finding"><div class="finding-header"><div class="finding-icon ' + f.severity + '">' + f.icon + '</div><h3>' + f.title + '</h3></div><p>' + f.desc + '</p></div>';
-    });
+    container.innerHTML = findings.map(f => `
+      <div class="finding">
+        <div class="finding-accent ${f.severity}"></div>
+        <div class="finding-tag ${f.severity}">${f.tag}</div>
+        <h3>${f.title}</h3>
+        <p>${f.desc}</p>
+      </div>`).join('');
 
-    // Cost estimate
+    // Cost
     const wasteRate = score >= 70 ? 0.12 : score >= 45 ? 0.22 : 0.32;
     const annualWaste = Math.round(monthly * 12 * wasteRate);
     document.getElementById('costAmount').textContent = '$' + annualWaste.toLocaleString();
-    document.getElementById('costLabel').textContent = 'Estimated annual savings opportunity based on your answers';
+    document.getElementById('costLabel').textContent = 'Estimated annual savings opportunity based on current stack size, spend level, and risk profile.';
 
-    // CTA personalisation
-    const ctaH = document.getElementById('ctaHeadline');
-    const ctaS = document.getElementById('ctaSubtext');
+    // Next steps
+    const nsBlock = document.getElementById('nextStepsBlock');
+    nsBlock.innerHTML = steps.map((s, i) => `
+      <div class="step-item">
+        <div class="step-num">${i + 1}</div>
+        <div class="step-text"><strong>${s.title}.</strong> ${s.text}</div>
+      </div>`).join('');
+
+    // CTA
     if (answers.role === 'advisor') {
-      ctaH.textContent = 'Turn this into a client deliverable';
-      ctaS.textContent = 'AppVentory runs this diagnostic automatically — using your client\'s accounting data. Get findings you can present, not just a score.';
+      document.getElementById('ctaHeadline').textContent = 'Turn this into a client deliverable';
+      document.getElementById('ctaSubtext').textContent = 'AppVentory runs this diagnostic automatically from your client\'s accounting data. Get findings you can present, track, and build a service around.';
     } else {
-      ctaH.textContent = 'See the full picture — from your actual data';
-      ctaS.textContent = 'This diagnostic is based on estimates. AppVentory connects to your accounting software and shows you exactly where money is going.';
+      document.getElementById('ctaHeadline').textContent = 'See the full picture from your actual data';
+      document.getElementById('ctaSubtext').textContent = 'This is based on estimates. AppVentory connects to your accounting software and shows exactly where money is going — no manual setup.';
     }
 
-    // Show results
     document.getElementById('resultsScreen').classList.add('active');
-    document.querySelector('.header h1').textContent = 'Your SaaS Stack Diagnostic';
-    document.querySelector('.header p').textContent = 'Here\'s what we found based on your answers.';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Netlify Forms AJAX submit
+  function encode(data) {
+    return Object.keys(data).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(data[k])).join('&');
   }
 
   function submitEmail() {
-    const email = document.getElementById('emailInput').value;
-    if (!email || !email.includes('@')) {
-      document.getElementById('emailInput').style.borderColor = 'var(--red)';
+    const emailInput = document.getElementById('emailInput');
+    const email = emailInput.value.trim();
+    if (!email || !email.includes('@') || !email.includes('.')) {
+      emailInput.style.borderColor = 'var(--red)';
+      emailInput.focus();
       return;
     }
-    document.getElementById('ctaForm').style.display = 'none';
-    document.getElementById('successMsg').style.display = 'block';
-    // In production: send email to your backend / CRM
-    console.log('Lead captured:', email, answers);
+    emailInput.style.borderColor = '';
+    fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: encode({
+        'form-name': 'saas-diagnostic',
+        email,
+        appCount: answers.appCount || '',
+        spend: answers.spend || '',
+        tracking: answers.tracking || '',
+        renewals: answers.renewals || '',
+        overlap: answers.overlap || '',
+        role: answers.role || '',
+        score: calcScore()
+      })
+    })
+    .finally(() => {
+      document.getElementById('ctaForm').style.display = 'none';
+      document.getElementById('successMsg').style.display = 'block';
+    });
   }
 
   function restart() {
     currentStep = 1;
     Object.keys(answers).forEach(k => delete answers[k]);
     document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
-    document.querySelectorAll('.btn-primary').forEach(b => { if (b.id) b.disabled = true; });
+    document.querySelectorAll('.btn-primary[id]').forEach(b => b.disabled = true);
     appSlider.value = 25;
     appDisplay.innerHTML = '25 <span>apps</span>';
     document.getElementById('resultsScreen').classList.remove('active');
-    document.querySelector('.progress-bar').style.display = '';
-    document.getElementById('stepLabel').style.display = '';
-    document.querySelector('.header h1').textContent = 'How healthy is your client\'s SaaS stack?';
-    document.querySelector('.header p').textContent = 'Answer 6 quick questions. Get a personalised diagnostic with specific findings you can act on.';
+    document.getElementById('progressWrap').style.display = '';
+    document.getElementById('mainHeader').style.display = '';
     document.getElementById('ctaForm').style.display = '';
     document.getElementById('successMsg').style.display = 'none';
-    document.getElementById('scoreArc').style.transition = 'none';
-    document.getElementById('scoreArc').style.strokeDashoffset = '326.7';
+    const arc = document.getElementById('scoreArc');
+    arc.style.transition = 'none';
+    arc.style.strokeDashoffset = '351.9';
     showStep(1);
   }
 

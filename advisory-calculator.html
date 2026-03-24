@@ -420,10 +420,26 @@ body {
 </head>
 <body>
 
+<!-- Netlify Forms detection -->
+<form name="advisory-calculator" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input type="email" name="email" />
+  <input type="hidden" name="clientCount" />
+  <input type="hidden" name="clientSize" />
+  <input type="hidden" name="feeModel" />
+  <input type="hidden" name="uptake" />
+  <input type="hidden" name="annualRevenue" />
+</form>
+
+<!-- Nav -->
+<nav style="position:sticky;top:0;z-index:100;background:rgba(13,21,32,0.90);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,0.075);padding:0 6%;display:flex;align-items:center;justify-content:space-between;height:58px;">
+  <a href="index.html" style="font-family:'Fraunces',serif;font-weight:700;font-size:18px;color:#ffffff;text-decoration:none;letter-spacing:-0.3px;">AppVentory</a>
+  <a href="index.html" style="font-size:13px;font-weight:500;color:#8fa3bc;text-decoration:none;">← Back to home</a>
+</nav>
+
 <div class="container">
 
   <div class="header">
-    <a href="index.html" class="logo">AppVentory</a>
+    <a href="index.html" class="logo" style="display:none;">AppVentory</a>
     <div class="eyebrow">For advisors</div>
     <h1>What is SaaS advisory <em>actually worth</em> to your practice?</h1>
     <p>Adjust the inputs below to see a realistic revenue estimate for adding SaaS management as a service line — based on your client base, not industry averages.</p>
@@ -674,15 +690,41 @@ body {
     }
   }
 
+  function encode(data) {
+    return Object.keys(data).map(k => encodeURIComponent(k) + '=' + encodeURIComponent(data[k])).join('&');
+  }
+
   function submitEmail() {
-    const email = document.getElementById('emailInput').value;
+    const emailInput = document.getElementById('emailInput');
+    const email = emailInput.value.trim();
     if (!email || !email.includes('@')) {
-      document.getElementById('emailInput').style.borderColor = '#e74c3c';
+      emailInput.style.borderColor = '#e74c3c';
+      emailInput.focus();
       return;
     }
-    document.getElementById('ctaForm').style.display = 'none';
-    document.getElementById('successMsg').style.display = 'block';
-    console.log('Lead captured:', email, state);
+    emailInput.style.borderColor = '';
+    const clients = parseInt(document.getElementById('clientCount').value);
+    const uptakePct = parseInt(document.getElementById('uptake').value);
+    const fm = feeModels[state.feeModel];
+    const eligible = Math.round(clients * uptakePct / 100);
+    const annualRevenue = eligible * fm.annualFee;
+    fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: encode({
+        'form-name': 'advisory-calculator',
+        email,
+        clientCount: clients,
+        clientSize: state.clientSize,
+        feeModel: state.feeModel,
+        uptake: uptakePct + '%',
+        annualRevenue: '$' + Math.round(annualRevenue).toLocaleString()
+      })
+    })
+    .finally(() => {
+      document.getElementById('ctaForm').style.display = 'none';
+      document.getElementById('successMsg').style.display = 'block';
+    });
   }
 
   function resetCalc() {
