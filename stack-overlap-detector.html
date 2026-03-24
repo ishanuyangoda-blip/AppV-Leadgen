@@ -66,11 +66,12 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(10,17,27,0.96); b
 
 .tools-list {
   display: none;
-  padding: 0 20px 16px;
-  display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 8px;
   padding: 12px 20px 16px;
+}
+.tools-list.open {
+  display: grid;
 }
 
 .tool-chip {
@@ -239,11 +240,10 @@ CATEGORIES.forEach((cat, ci) => {
     </div>
     <div class="tools-list" id="tools-${ci}">
       ${cat.tools.map(t => `
-        <label class="tool-chip" onclick="toggleTool(this,'${cat.name}','${t}',${ci})">
-          <input type="checkbox" value="${t}">
+        <div class="tool-chip" onclick="toggleTool(this,'${cat.name}','${t}',${ci})">
           <span class="chip-check"></span>
           <span class="chip-label">${t}</span>
-        </label>
+        </div>
       `).join('')}
     </div>
   `;
@@ -254,14 +254,14 @@ function toggleCat(header) {
   const block = header.parentElement;
   const toolsList = header.nextElementSibling;
   block.classList.toggle('open');
-  toolsList.style.display = block.classList.contains('open') ? 'grid' : 'none';
+  toolsList.classList.toggle('open', block.classList.contains('open'));
 }
 
 // Open first cat by default
 const firstBlock = container.querySelector('.category-block');
 if (firstBlock) {
   firstBlock.classList.add('open');
-  firstBlock.querySelector('.tools-list').style.display = 'grid';
+  firstBlock.querySelector('.tools-list').classList.add('open');
 }
 
 function toggleTool(chip, catName, toolName, catIdx) {
