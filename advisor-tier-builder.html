@@ -78,6 +78,26 @@ nav { position: sticky; top: 0; z-index: 100; background: rgba(13,21,32,0.92); b
 .context-title { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
 .context-text { font-size: 14px; color: var(--text); line-height: 1.6; }
 
+/* AppVentory plan badge on tier cards */
+.plan-banner {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg); border: 1px solid var(--border-hi);
+  border-radius: 8px; padding: 11px 14px; margin-top: 20px;
+}
+.plan-banner-left { display: flex; flex-direction: column; gap: 2px; }
+.plan-banner-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+.plan-banner-name { font-size: 14px; font-weight: 600; color: var(--white); }
+.plan-banner-price { font-size: 13px; color: var(--text-muted); }
+.plan-banner-price strong { color: var(--white); font-weight: 700; }
+.plan-banner-price .save-badge { background: var(--green-bg); color: var(--green); font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 99px; margin-left: 6px; }
+.plan-banner-link {
+  font-size: 12px; font-weight: 600; color: var(--pink);
+  text-decoration: none; white-space: nowrap;
+  border: 1px solid var(--pink-border); border-radius: 6px;
+  padding: 5px 10px; transition: background 0.15s;
+}
+.plan-banner-link:hover { background: var(--pink-dim); }
+
 .cta-card { background: var(--surface); border: 1px solid var(--pink-border); border-radius: var(--radius); padding: 32px; text-align: center; margin-top: 32px; }
 .cta-card h3 { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
 .cta-card p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; max-width: 380px; margin-left: auto; margin-right: auto; }
@@ -257,18 +277,57 @@ function showResults() {
   const practiceNames = { accountant: 'accounting practice', tech: 'tech advisory practice', msp: 'MSP', consultant: 'consultancy' };
   document.getElementById('resultsTitle').textContent = `A three-tier service model for your ${practiceNames[practiceType]}.`;
 
+  // AppVentory plan mapping
+  const avPlans = [
+    {
+      name: 'Advisor',
+      monthly: 'Free',
+      annual: null,
+      desc: 'Get visibility. Start the conversation.',
+      link: 'https://appventory.com/pricing'
+    },
+    {
+      name: 'Advisor 10',
+      monthly: '$50/month',
+      annual: '$480/year',
+      save: 'Save $120',
+      desc: 'Collaborate with clients. Deliver deeper insights.',
+      link: 'https://appventory.com/pricing'
+    },
+    {
+      name: 'Tech Service',
+      monthly: '$150/month',
+      annual: '$1,440/year',
+      save: 'Save $360',
+      desc: 'Turn insight into implementation revenue.',
+      link: 'https://appventory.com/pricing'
+    }
+  ];
+
   // Tier definitions based on inputs
   const tiers = buildTiers(practiceType, time, goal, clientCount, currentAdvisory);
-  document.getElementById('tiersGrid').innerHTML = tiers.map((t, i) =>
-    `<div class="tier-card ${i === 1 ? 'tier-featured' : ''}">
+  document.getElementById('tiersGrid').innerHTML = tiers.map((t, i) => {
+    const plan = avPlans[i];
+    const priceHtml = plan.monthly === 'Free'
+      ? `<strong>Free</strong> to get started`
+      : `<strong>${plan.monthly}</strong> · ${plan.annual} <span class="save-badge">${plan.save}</span>`;
+    return `<div class="tier-card ${i === 1 ? 'tier-featured' : ''}">
       <div class="tier-top">
         <span class="tier-name">${t.name}</span>
         <span class="tier-cadence">${t.cadence}</span>
       </div>
       <div class="tier-positioning">${t.positioning}</div>
       <ul class="tier-deliverables">${t.deliverables.map(d => `<li>${d}</li>`).join('')}</ul>
-    </div>`
-  ).join('');
+      <div class="plan-banner">
+        <div class="plan-banner-left">
+          <span class="plan-banner-label">AppVentory plan</span>
+          <span class="plan-banner-name">${plan.name}</span>
+          <span class="plan-banner-price">${priceHtml}</span>
+        </div>
+        <a class="plan-banner-link" href="${plan.link}" target="_blank">View plan →</a>
+      </div>
+    </div>`;
+  }).join('');
 
   // Context
   const contextMessages = {
